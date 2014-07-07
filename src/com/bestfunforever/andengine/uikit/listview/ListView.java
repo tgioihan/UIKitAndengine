@@ -1,13 +1,12 @@
 package com.bestfunforever.andengine.uikit.listview;
 
-import java.util.ArrayList;
-
 import org.andengine.entity.IEntity;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.shape.IAreaShape;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
+import org.andengine.util.adt.list.SmartList;
 
 import android.database.DataSetObserver;
 import android.util.Log;
@@ -16,12 +15,14 @@ import android.view.VelocityTracker;
 
 public class ListView extends Rectangle {
 
+	private static final String TAG = "ListView";
+
 	Recycler mRecycler;
 	BaseAdapter mAdapter;
 	DataSetObserver mDataSetObserver;
 	SimpleBaseGameActivity mContext;
 
-	ArrayList<IAreaShape> mChilds = new ArrayList<IAreaShape>();
+	SmartList<IAreaShape> mChilds = new SmartList<IAreaShape>();
 
 	private float childWidth, childHeight;
 
@@ -49,6 +50,7 @@ public class ListView extends Rectangle {
 			@Override
 			public void onInvalidated() {
 				super.onInvalidated();
+				layoutChildrent();
 			}
 
 		};
@@ -76,6 +78,7 @@ public class ListView extends Rectangle {
 				}
 				mChilds.clear();
 				mRecycler.clear();
+				mChilds.clear();
 				layoutChildrent();
 			}
 		});
@@ -102,6 +105,8 @@ public class ListView extends Rectangle {
 		}
 		mView = obtainView(position);
 		mView.setY(top);
+		mChilds.add(mView);
+		attachChild(mView);
 		return mView;
 	}
 
@@ -113,11 +118,9 @@ public class ListView extends Rectangle {
 		}
 		view.setWidth(mAdapter.getWidth());
 		view.setHeight(mAdapter.getHeight());
-		TouchEvent event = null;
-		event.getMotionEvent();
 		return view;
 	}
-	
+
 	private float initialY;
 
 	@Override
@@ -127,7 +130,6 @@ public class ListView extends Rectangle {
 		}
 		final MotionEvent motionEvent = event.getMotionEvent();
 		velocityTracker.addMovement(motionEvent); // add this movement to it
-		
 
 		switch (event.getAction()) {
 			case TouchEvent.ACTION_DOWN :
@@ -136,7 +138,7 @@ public class ListView extends Rectangle {
 
 			case TouchEvent.ACTION_MOVE :
 				final float diffY = event.getY() - initialY;
-				scrollBy(0,diffY);
+				scrollByY(diffY);
 				break;
 
 			case TouchEvent.ACTION_UP :
@@ -149,13 +151,76 @@ public class ListView extends Rectangle {
 
 		return super.onAreaTouched(event, pTouchAreaLocalX, pTouchAreaLocalY);
 	}
-	
+
 	/**
 	 * @param diffX
 	 * @param diffY
 	 */
-	private void scrollBy(int diffX, float diffY) {
+	private void scrollByY(float diffY) {
+		final int childCount = mChilds.size();
+		if (childCount == 0) {
+			return;
+		}
+		final float firstTop = mChilds.get(0).getY();
+		final float lastBottom = mChilds.getLast().getY() + mChilds.getLast().getHeight();
+		final float spaceBelow = getHeight() - lastBottom;
+		final float absDiffY = Math.abs(diffY);
+		final boolean down = diffY > 0;
+		if (firstTop >= absDiffY && spaceBelow >= absDiffY) {
+			// in case first and last both in draw rectangle
+		} else {
+			if ((mFirstPosition == 0 && firstTop >= 0)
+					|| (mFirstPosition + childCount == mAdapter.getCount() && lastBottom < getHeight())) {
+				// no need track mmotion
+				return;
+			}
+
+			if (down) {
+				final float top = -diffY;
+				for (int i = 0; i < childCount; i++) {
+					final IAreaShape view = mChilds.get(i);
+					if (view.getY() + view.getHeight() >= top) {
+						break;
+					} else {
+						// add view to recycle
+						addViewToRecycle(view);
+						Log.d(TAG, TAG + " add view to recycle at " + i);
+					}
+				}
+
+			} else {
+				final float bottom = getHeight() + diffY;
+				for (int i = 0; i < childCount; i++) {
+					final IAreaShape view = mChilds.get(i);
+					if (view.getY() <= bottom) {
+						break;
+					} else {
+						// add view to recycle
+						addViewToRecycle(view);
+						Log.d(TAG, TAG + " add view to recycle at " + i);
+					}
+				}
+			}
+
+			// move item acitive
+			for (int i = 0; i < mChilds.size(); i++) {
+				final IAreaShape view = mChilds.get(i);
+				view.setY(view.getY() + diffY);
+			}
+
+			// get scrap view to active
+			fillGap(down);
+		}
+
+	}
+
+	private void fillGap(boolean down) {
 		
 	}
 
+	private void addViewToRecycle(IAreaShape view) {
+		mRecycler.addScrapView(view);
+		detachChild(view);
+		mChilds.remove(view);
+	}
 }
