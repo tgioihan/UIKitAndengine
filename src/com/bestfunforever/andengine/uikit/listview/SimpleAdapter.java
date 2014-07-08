@@ -2,9 +2,8 @@ package com.bestfunforever.andengine.uikit.listview;
 
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
-import android.widget.BaseAdapter;
 
-public abstract class SimpleAdapter extends BaseAdapter{
+public abstract class SimpleAdapter implements BaseAdapter{
 	private final DataSetObservable mDataSetObservable = new DataSetObservable();
 
 	@Override

@@ -56,12 +56,13 @@ public class ListView extends Rectangle {
 		};
 	}
 
-	public void setAdateper(BaseAdapter adapter) {
+	public void setAdapter(BaseAdapter adapter) {
 		if (mAdapter != null) {
 			mAdapter.unregisterDataSetObserver(mDataSetObserver);
 		}
-
 		this.mAdapter = adapter;
+		mRecycler.clear();
+		mRecycler.setViewTypeCount(mAdapter.getViewTypeCount());
 		childWidth = mAdapter.getWidth();
 		childHeight = mAdapter.getHeight();
 		this.mAdapter.registerDataSetObserver(mDataSetObserver);
@@ -88,7 +89,7 @@ public class ListView extends Rectangle {
 		float top = 0;
 		int position = mFirstPosition;
 		while (top < getHeight() && position < mAdapter.getCount()) {
-			IAreaShape view = makeAndAddView(position, top);
+			IAreaShape view = makeAndAddView(position, top,mChilds.size());
 			top += view.getHeight();
 			position++;
 		}
@@ -96,7 +97,7 @@ public class ListView extends Rectangle {
 		dataChanged = false;
 	}
 
-	private IAreaShape makeAndAddView(int position, float top) {
+	private IAreaShape makeAndAddView(int position, float top, int positionToAdd) {
 
 		IAreaShape mView = mRecycler.getActiveView(position);
 		if (mView != null && dataChanged) {
@@ -105,7 +106,8 @@ public class ListView extends Rectangle {
 		}
 		mView = obtainView(position);
 		mView.setY(top);
-		mChilds.add(mView);
+		Log.d(TAG, TAG+" makeAndAddView "+position);
+		mChilds.add(positionToAdd,mView);
 		attachChild(mView);
 		return mView;
 	}
@@ -122,6 +124,7 @@ public class ListView extends Rectangle {
 	}
 
 	private float initialY;
+	private float currentY;
 
 	@Override
 	public boolean onAreaTouched(TouchEvent event, float pTouchAreaLocalX, float pTouchAreaLocalY) {
@@ -133,11 +136,12 @@ public class ListView extends Rectangle {
 
 		switch (event.getAction()) {
 			case TouchEvent.ACTION_DOWN :
-				initialY = event.getY();
+				initialY =currentY= event.getY();
 				break;
 
 			case TouchEvent.ACTION_MOVE :
-				final float diffY = event.getY() - initialY;
+				final float diffY = event.getY() - currentY;
+				currentY= event.getY();
 				scrollByY(diffY);
 				break;
 
@@ -158,55 +162,53 @@ public class ListView extends Rectangle {
 	 */
 	private void scrollByY(float diffY) {
 		final int childCount = mChilds.size();
+		Log.d(TAG, TAG+" scrollByY childCount "+childCount);
 		if (childCount == 0) {
 			return;
 		}
 		final float firstTop = mChilds.get(0).getY();
 		final float lastBottom = mChilds.getLast().getY() + mChilds.getLast().getHeight();
-		final float spaceBelow = getHeight() - lastBottom;
-		final float absDiffY = Math.abs(diffY);
 		final boolean down = diffY > 0;
-		if (firstTop >= absDiffY && spaceBelow >= absDiffY) {
+		Log.d(TAG, TAG+" down "+down);
+		Log.d(TAG, TAG+" scrollByY firstTop "+firstTop+" diffY "+diffY +" "+(firstTop + diffY)+" "+(lastBottom + diffY));
+		if (firstTop + diffY >= 0 && lastBottom + diffY <= getHeight()) {
 			// in case first and last both in draw rectangle
+			moveCurrentItem(diffY);
 		} else {
-			if ((mFirstPosition == 0 && firstTop >= 0)
-					|| (mFirstPosition + childCount == mAdapter.getCount() && lastBottom < getHeight())) {
+			if ((mFirstPosition == 0 && firstTop >= 0 && diffY>0)
+					|| (mFirstPosition + childCount == mAdapter.getCount() && lastBottom < getHeight()) && diffY<0) {
 				// no need track mmotion
 				return;
 			}
 
 			if (down) {
-				final float top = -diffY;
 				for (int i = 0; i < childCount; i++) {
 					final IAreaShape view = mChilds.get(i);
-					if (view.getY() + view.getHeight() >= top) {
+					if (view.getY()+ view.getHeight() +diffY >= 0) {
 						break;
 					} else {
 						// add view to recycle
 						addViewToRecycle(view);
-						Log.d(TAG, TAG + " add view to recycle at " + i);
+						mFirstPosition ++;
+						Log.d(TAG, TAG +" down "+down + " add view to recycle at " + i);
 					}
 				}
 
 			} else {
-				final float bottom = getHeight() + diffY;
 				for (int i = 0; i < childCount; i++) {
 					final IAreaShape view = mChilds.get(i);
-					if (view.getY() <= bottom) {
+					if (view.getY() +diffY <= getHeight()) {
 						break;
 					} else {
 						// add view to recycle
 						addViewToRecycle(view);
-						Log.d(TAG, TAG + " add view to recycle at " + i);
+						Log.d(TAG, TAG +" down "+down +" add view to recycle at " + i);
 					}
 				}
 			}
 
 			// move item acitive
-			for (int i = 0; i < mChilds.size(); i++) {
-				final IAreaShape view = mChilds.get(i);
-				view.setY(view.getY() + diffY);
-			}
+			moveCurrentItem(diffY);
 
 			// get scrap view to active
 			fillGap(down);
@@ -214,8 +216,44 @@ public class ListView extends Rectangle {
 
 	}
 
+	private void moveCurrentItem(float diffY) {
+		for (int i = 0; i < mChilds.size(); i++) {
+			final IAreaShape view = mChilds.get(i);
+			view.setY(view.getY() + diffY);
+		}
+	}
+
 	private void fillGap(boolean down) {
-		
+		final int childCOunt = mChilds.size();
+		if (down) {
+			final float startOffset = childCOunt > 0 ? mChilds.get(0).getY() : (getHeight());
+			fillUp(mFirstPosition - 1, startOffset);
+		} else {
+			final float startOffset = childCOunt > 0 ? (mChilds.get(childCOunt - 1).getHeight() + mChilds.get(
+					childCOunt - 1).getY()) : 0;
+			fillDown(mFirstPosition + childCOunt, startOffset);
+		}
+	}
+
+	private void fillUp(int position, float startOffset) {
+		// TODO Auto-generated method stub
+		Log.d(TAG, TAG+" fillUp start "+ position+ startOffset);
+		while (startOffset > 0 && position>=0) {
+			mFirstPosition = position;
+			Log.d(TAG, TAG+" fillUp "+ position+ startOffset);
+			IAreaShape view = makeAndAddView(position, startOffset-mAdapter.getHeight(),0);
+			startOffset -= view.getHeight();
+			position -= 1;
+			
+		}
+	}
+
+	private void fillDown(int position, float startOffset) {
+		while (startOffset < getHeight()&& position<=mAdapter.getCount()) {
+			IAreaShape view = makeAndAddView(position, startOffset,mChilds.size());
+			startOffset += view.getHeight();
+			position +=1;
+		}
 	}
 
 	private void addViewToRecycle(IAreaShape view) {
