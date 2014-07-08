@@ -9,9 +9,11 @@ import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.adt.list.SmartList;
 
 import android.database.DataSetObserver;
+import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
+import android.widget.Scroller;
 
 public class ListView extends Rectangle {
 
@@ -33,12 +35,14 @@ public class ListView extends Rectangle {
 
 	private boolean dataChanged = true;
 	private VelocityTracker velocityTracker;
+	private Fillinger mFillinger;
 
 	public ListView(SimpleBaseGameActivity Context, float pX, float pY, float pWidth, float pHeight,
 			VertexBufferObjectManager pVertexBufferObjectManager) {
 		super(pX, pY, pWidth, pHeight, pVertexBufferObjectManager);
 		this.mContext = Context;
 		mRecycler = new Recycler();
+		mFillinger = new Fillinger();
 		mDataSetObserver = new DataSetObserver() {
 
 			@Override
@@ -54,6 +58,14 @@ public class ListView extends Rectangle {
 			}
 
 		};
+		mContext.runOnUiThread(new Runnable() {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				mHandler = new Handler();
+			}
+		});
 	}
 
 	public void setAdapter(BaseAdapter adapter) {
@@ -137,6 +149,7 @@ public class ListView extends Rectangle {
 		switch (event.getAction()) {
 			case TouchEvent.ACTION_DOWN :
 				initialY =currentY= event.getY();
+				stopMovingMotion();
 				break;
 
 			case TouchEvent.ACTION_MOVE :
@@ -146,7 +159,13 @@ public class ListView extends Rectangle {
 				break;
 
 			case TouchEvent.ACTION_UP :
-
+				velocityTracker.computeCurrentVelocity(1000);
+				int initialVelocity = (int)velocityTracker.getYVelocity();
+				Log.d(TAG, TAG+ " initialVelocity "+initialVelocity);
+				if(Math.abs(initialVelocity)>0){
+					//start filling
+					mFillinger.start(0, (int) event.getY(), -initialVelocity);
+				}
 				break;
 
 			default :
@@ -195,7 +214,7 @@ public class ListView extends Rectangle {
 				}
 
 			} else {
-				for (int i = 0; i < childCount; i++) {
+				for (int i = mChilds.size()-1; i >= 0; i--) {
 					final IAreaShape view = mChilds.get(i);
 					if (view.getY() +diffY <= getHeight()) {
 						break;
@@ -260,5 +279,45 @@ public class ListView extends Rectangle {
 		mRecycler.addScrapView(view);
 		detachChild(view);
 		mChilds.remove(view);
+	}
+
+	private Handler mHandler ;
+	
+	public void post(Runnable runnable){
+		mHandler.post(runnable);
+	}
+	
+	private void stopMovingMotion(){
+		mHandler.removeCallbacks(mFillinger);
+	}
+	
+	public class Fillinger implements Runnable{
+		private Scroller mScroller;
+		private int lastY ;
+		public Fillinger(){
+			mScroller = new Scroller(mContext);
+		}
+		
+		public void start(int startX, int startY ,int initialVelocity){
+			lastY = startY;
+			mScroller.fling(startX, startY, 0, initialVelocity, 0, Integer.MAX_VALUE, 0, Integer.MAX_VALUE);
+			post(this);
+		}
+
+		@Override
+		public void run() {
+			if(mAdapter == null || mAdapter.getCount() == 0|| mChilds.size() == 0){
+				return ;
+			}
+			boolean more = mScroller.computeScrollOffset();
+			int currenY = mScroller.getCurrY();
+			int diffY = lastY - currenY;
+			lastY = currenY;
+			scrollByY(diffY);
+			if(more){
+				post(this);
+			}
+		}
+		
 	}
 }
