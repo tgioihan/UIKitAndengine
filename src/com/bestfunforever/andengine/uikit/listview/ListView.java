@@ -1,7 +1,6 @@
 package com.bestfunforever.andengine.uikit.listview;
 
 import org.andengine.entity.IEntity;
-import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.shape.IAreaShape;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
@@ -15,7 +14,9 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.widget.Scroller;
 
-public class ListView extends Rectangle {
+import com.bestfunforever.andengine.uikit.entity.ClipingRectangle;
+
+public class ListView extends ClipingRectangle {
 
 	private static final String TAG = "ListView";
 
@@ -165,7 +166,7 @@ public class ListView extends Rectangle {
 			int initialVelocity = (int) velocityTracker.getYVelocity();
 			if (Math.abs(initialVelocity) > 0) {
 				// start filling
-				mFillinger.start(0, (int) event.getY(), -initialVelocity);
+				mFillinger.fling(0, (int) event.getY(), -initialVelocity);
 			}
 			velocityTracker.recycle();
 			break;
@@ -174,7 +175,7 @@ public class ListView extends Rectangle {
 			break;
 		}
 
-		return super.onAreaTouched(event, pTouchAreaLocalX, pTouchAreaLocalY);
+		return true;
 	}
 
 	/**
@@ -282,10 +283,10 @@ public class ListView extends Rectangle {
 	}
 
 	public void setSelection(int selection) {
-		setSelectionFromTop(selection, 0);
+		setSelectionFromTop(selection, 0,false);
 	}
 
-	public void setSelectionFromTop(int selection, float diffTop) {
+	public void setSelectionFromTop(int selection, float diffTop,boolean scroll) {
 		if(mSelection > mAdapter.getCount()){
 			return;
 		}
@@ -296,14 +297,11 @@ public class ListView extends Rectangle {
 		if(mAdapter!=null && mAdapter.getCount()>0&& mChilds.size()>0){
 			int diffPos = mSelection - mFirstPosition;
 			final float diffY = diffPos*mAdapter.getHeight();
-			mContext.runOnUpdateThread(new Runnable() {
-
-				@Override
-				public void run() {
-					scrollByY(diffY);
-				}
-			});
-			
+			if(scroll){
+//				mFillinger.scroll(startX, startY, dx, dy);
+			}else{
+				layoutChildrent();
+			}
 		}
 	}
 
@@ -326,11 +324,15 @@ public class ListView extends Rectangle {
 			mScroller = new Scroller(mContext);
 		}
 
-		public void start(int startX, int startY, int initialVelocity) {
+		public void fling(int startX, int startY, int initialVelocity) {
 			lastY = startY;
 			mScroller.fling(startX, startY, 0, initialVelocity, 0, Integer.MAX_VALUE, 0, Integer.MAX_VALUE);
 			post(this);
 			Log.d(tag, tag + " duration " + mScroller.getDuration() + " initialVelocity " + initialVelocity);
+		}
+		
+		public void scroll(int startX, int startY, int dx, int dy){
+//			mScroller.startScroll(startX, startY, dx, dy, duration);
 		}
 
 		@Override
