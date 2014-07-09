@@ -38,6 +38,7 @@ public class TestActivity extends SimpleBaseGameActivity{
 		ListView mListView = new ListView(this, 0, 10, 480, 800, getVertexBufferObjectManager());
 		TestAdapter testAdapter = new TestAdapter(getVertexBufferObjectManager(), mFont);
 		mListView.setAdapter(testAdapter);
+		mListView.setSelection(5);
 		scene.attachChild(mListView);
 		scene.registerTouchArea(mListView);
 		return scene;

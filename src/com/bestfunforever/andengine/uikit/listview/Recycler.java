@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.andengine.entity.shape.IAreaShape;
 
+import android.util.Log;
+
 public class Recycler {
 	private IAreaShape[] mActiveViews = new IAreaShape[0];
 	private ArrayList<IAreaShape>[] mScrapViews;
@@ -100,12 +102,12 @@ public class Recycler {
         if (!shouldRecycleViewType(viewType)) {
             return;
         }
-
         if (mViewTypeCount == 1) {
             mCurrentScrap.add(scrap);
         } else {
             mScrapViews[viewType].add(scrap);
         }
+        Log.d("", "addScrapView size "+ mCurrentScrap.size()+" ");
     }
 
     /**

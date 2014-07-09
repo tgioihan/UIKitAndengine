@@ -26,8 +26,6 @@ public class ListView extends Rectangle {
 
 	SmartList<IAreaShape> mChilds = new SmartList<IAreaShape>();
 
-	private float childWidth, childHeight;
-
 	int mSelection;
 	int mFirstPosition;
 
@@ -59,7 +57,7 @@ public class ListView extends Rectangle {
 
 		};
 		mContext.runOnUiThread(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
@@ -75,8 +73,6 @@ public class ListView extends Rectangle {
 		this.mAdapter = adapter;
 		mRecycler.clear();
 		mRecycler.setViewTypeCount(mAdapter.getViewTypeCount());
-		childWidth = mAdapter.getWidth();
-		childHeight = mAdapter.getHeight();
 		this.mAdapter.registerDataSetObserver(mDataSetObserver);
 		removeAllView(true);
 	}
@@ -86,6 +82,7 @@ public class ListView extends Rectangle {
 
 			@Override
 			public void run() {
+//				mchil
 				for (IEntity entity : mChilds) {
 					detachChild(entity);
 				}
@@ -93,6 +90,7 @@ public class ListView extends Rectangle {
 				mRecycler.clear();
 				mChilds.clear();
 				layoutChildrent();
+				
 			}
 		});
 	}
@@ -101,7 +99,7 @@ public class ListView extends Rectangle {
 		float top = 0;
 		int position = mFirstPosition;
 		while (top < getHeight() && position < mAdapter.getCount()) {
-			IAreaShape view = makeAndAddView(position, top,mChilds.size());
+			IAreaShape view = makeAndAddView(position, top, mChilds.size());
 			top += view.getHeight();
 			position++;
 		}
@@ -113,13 +111,11 @@ public class ListView extends Rectangle {
 
 		IAreaShape mView = mRecycler.getActiveView(position);
 		if (mView != null && dataChanged) {
-			Log.d("", " use view active at " + position + "no need recycle or initial ");
 			return mView;
 		}
 		mView = obtainView(position);
 		mView.setY(top);
-		Log.d(TAG, TAG+" makeAndAddView "+position);
-		mChilds.add(positionToAdd,mView);
+		mChilds.add(positionToAdd, mView);
 		attachChild(mView);
 		return mView;
 	}
@@ -127,9 +123,8 @@ public class ListView extends Rectangle {
 	private IAreaShape obtainView(int position) {
 		int type = mAdapter.getItemViewType(position);
 		IAreaShape view = mRecycler.getScrapView(position, type);
-		if (view == null) {
-			view = mAdapter.getView(position, view);
-		}
+		view = mAdapter.getView(position, view);
+		view.setTag(type);
 		view.setWidth(mAdapter.getWidth());
 		view.setHeight(mAdapter.getHeight());
 		return view;
@@ -147,29 +142,36 @@ public class ListView extends Rectangle {
 		velocityTracker.addMovement(motionEvent); // add this movement to it
 
 		switch (event.getAction()) {
-			case TouchEvent.ACTION_DOWN :
-				initialY =currentY= event.getY();
-				stopMovingMotion();
-				break;
+		case TouchEvent.ACTION_DOWN:
+			initialY = currentY = event.getY();
+			stopMovingMotion();
+			break;
 
-			case TouchEvent.ACTION_MOVE :
-				final float diffY = event.getY() - currentY;
-				currentY= event.getY();
-				scrollByY(diffY);
-				break;
+		case TouchEvent.ACTION_MOVE:
+			final float diffY = event.getY() - currentY;
+			currentY = event.getY();
+			mContext.runOnUpdateThread(new Runnable() {
 
-			case TouchEvent.ACTION_UP :
-				velocityTracker.computeCurrentVelocity(1000);
-				int initialVelocity = (int)velocityTracker.getYVelocity();
-				Log.d(TAG, TAG+ " initialVelocity "+initialVelocity);
-				if(Math.abs(initialVelocity)>0){
-					//start filling
-					mFillinger.start(0, (int) event.getY(), -initialVelocity);
+				@Override
+				public void run() {
+					scrollByY(diffY);
 				}
-				break;
+			});
 
-			default :
-				break;
+			break;
+
+		case TouchEvent.ACTION_UP:
+			velocityTracker.computeCurrentVelocity(1000);
+			int initialVelocity = (int) velocityTracker.getYVelocity();
+			if (Math.abs(initialVelocity) > 0) {
+				// start filling
+				mFillinger.start(0, (int) event.getY(), -initialVelocity);
+			}
+			velocityTracker.recycle();
+			break;
+
+		default:
+			break;
 		}
 
 		return super.onAreaTouched(event, pTouchAreaLocalX, pTouchAreaLocalY);
@@ -181,47 +183,47 @@ public class ListView extends Rectangle {
 	 */
 	private void scrollByY(float diffY) {
 		final int childCount = mChilds.size();
-		Log.d(TAG, TAG+" scrollByY childCount "+childCount);
 		if (childCount == 0) {
 			return;
 		}
 		final float firstTop = mChilds.get(0).getY();
 		final float lastBottom = mChilds.getLast().getY() + mChilds.getLast().getHeight();
 		final boolean down = diffY > 0;
-		Log.d(TAG, TAG+" down "+down);
-		Log.d(TAG, TAG+" scrollByY firstTop "+firstTop+" diffY "+diffY +" "+(firstTop + diffY)+" "+(lastBottom + diffY));
 		if (firstTop + diffY >= 0 && lastBottom + diffY <= getHeight()) {
 			// in case first and last both in draw rectangle
 			moveCurrentItem(diffY);
 		} else {
-			if ((mFirstPosition == 0 && firstTop >= 0 && diffY>0)
-					|| (mFirstPosition + childCount == mAdapter.getCount() && lastBottom < getHeight()) && diffY<0) {
+			if ((mFirstPosition == 0 && firstTop + diffY >= 0 && diffY > 0)
+					|| (mFirstPosition + childCount - 1 == mAdapter.getCount() && lastBottom + diffY < getHeight())
+					&& diffY < 0) {
 				// no need track mmotion
 				return;
 			}
 
 			if (down) {
-				for (int i = 0; i < childCount; i++) {
+				for (int i = mChilds.size() - 1; i >= 0; i--) {
 					final IAreaShape view = mChilds.get(i);
-					if (view.getY()+ view.getHeight() +diffY >= 0) {
+					if (view.getY() + diffY <= getHeight() + mAdapter.getHeight()) {
 						break;
 					} else {
 						// add view to recycle
 						addViewToRecycle(view);
-						mFirstPosition ++;
-						Log.d(TAG, TAG +" down "+down + " add view to recycle at " + i);
+						i--;
 					}
 				}
 
 			} else {
-				for (int i = mChilds.size()-1; i >= 0; i--) {
+
+				for (int i = 0; i < childCount; i++) {
 					final IAreaShape view = mChilds.get(i);
-					if (view.getY() +diffY <= getHeight()) {
+
+					if (view.getY() + view.getHeight() + diffY + mAdapter.getHeight() >= 0) {
 						break;
 					} else {
 						// add view to recycle
 						addViewToRecycle(view);
-						Log.d(TAG, TAG +" down "+down +" add view to recycle at " + i);
+						mFirstPosition++;
+						i--;
 					}
 				}
 			}
@@ -256,22 +258,20 @@ public class ListView extends Rectangle {
 
 	private void fillUp(int position, float startOffset) {
 		// TODO Auto-generated method stub
-		Log.d(TAG, TAG+" fillUp start "+ position+ startOffset);
-		while (startOffset > 0 && position>=0) {
+		while (startOffset > -mAdapter.getHeight() && position >= 0) {
 			mFirstPosition = position;
-			Log.d(TAG, TAG+" fillUp "+ position+ startOffset);
-			IAreaShape view = makeAndAddView(position, startOffset-mAdapter.getHeight(),0);
+			IAreaShape view = makeAndAddView(position, startOffset - mAdapter.getHeight(), 0);
 			startOffset -= view.getHeight();
 			position -= 1;
-			
+
 		}
 	}
 
 	private void fillDown(int position, float startOffset) {
-		while (startOffset < getHeight()&& position<=mAdapter.getCount()) {
-			IAreaShape view = makeAndAddView(position, startOffset,mChilds.size());
+		while (startOffset < getHeight() + mAdapter.getHeight() && position <= mAdapter.getCount()) {
+			IAreaShape view = makeAndAddView(position, startOffset, mChilds.size());
 			startOffset += view.getHeight();
-			position +=1;
+			position += 1;
 		}
 	}
 
@@ -281,43 +281,78 @@ public class ListView extends Rectangle {
 		mChilds.remove(view);
 	}
 
-	private Handler mHandler ;
-	
-	public void post(Runnable runnable){
+	public void setSelection(int selection) {
+		setSelectionFromTop(selection, 0);
+	}
+
+	public void setSelectionFromTop(int selection, float diffTop) {
+		if(mSelection > mAdapter.getCount()){
+			return;
+		}
+		mSelection = selection;
+		if(mFirstPosition == mSelection){
+			return;
+		}
+		if(mAdapter!=null && mAdapter.getCount()>0&& mChilds.size()>0){
+			int diffPos = mSelection - mFirstPosition;
+			final float diffY = diffPos*mAdapter.getHeight();
+			mContext.runOnUpdateThread(new Runnable() {
+
+				@Override
+				public void run() {
+					scrollByY(diffY);
+				}
+			});
+			
+		}
+	}
+
+	private Handler mHandler;
+
+	public void post(Runnable runnable) {
 		mHandler.post(runnable);
 	}
-	
-	private void stopMovingMotion(){
+
+	private void stopMovingMotion() {
 		mHandler.removeCallbacks(mFillinger);
 	}
-	
-	public class Fillinger implements Runnable{
+
+	public class Fillinger implements Runnable {
+		private static final String tag = "Fillinger";
 		private Scroller mScroller;
-		private int lastY ;
-		public Fillinger(){
+		private int lastY;
+
+		public Fillinger() {
 			mScroller = new Scroller(mContext);
 		}
-		
-		public void start(int startX, int startY ,int initialVelocity){
+
+		public void start(int startX, int startY, int initialVelocity) {
 			lastY = startY;
 			mScroller.fling(startX, startY, 0, initialVelocity, 0, Integer.MAX_VALUE, 0, Integer.MAX_VALUE);
 			post(this);
+			Log.d(tag, tag + " duration " + mScroller.getDuration() + " initialVelocity " + initialVelocity);
 		}
 
 		@Override
 		public void run() {
-			if(mAdapter == null || mAdapter.getCount() == 0|| mChilds.size() == 0){
-				return ;
+			if (mAdapter == null || mAdapter.getCount() == 0 || mChilds.size() == 0) {
+				return;
 			}
 			boolean more = mScroller.computeScrollOffset();
 			int currenY = mScroller.getCurrY();
-			int diffY = lastY - currenY;
+			final int diffY = lastY - currenY;
 			lastY = currenY;
-			scrollByY(diffY);
-			if(more){
+			mContext.runOnUpdateThread(new Runnable() {
+
+				@Override
+				public void run() {
+					scrollByY(diffY);
+				}
+			});
+			if (more) {
 				post(this);
 			}
 		}
-		
+
 	}
 }
