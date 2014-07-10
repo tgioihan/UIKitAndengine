@@ -17,25 +17,37 @@ import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.color.Color;
 
 import android.graphics.Typeface;
+import android.util.DisplayMetrics;
 import android.widget.Toast;
 
 import com.bestfunforever.andengine.uikit.listview.ListView;
 import com.bestfunforever.andengine.uikit.listview.ListView.OnItemClickListenner;
+import com.bestfunforever.andengine.uikit.util.RatioUtils;
 
 public class TestActivity extends SimpleBaseGameActivity{
 	
-	private static final int CAMERA_WIDTH = 1080;
-	private static final int CAMERA_HEIGHT = 1920;
+	private static int CAMERA_WIDTH = 480;
+	private static int CAMERA_HEIGHT = 320;
 	
-	public static final int LIST_WIDTH = 800;
-	public static final int LIST_HEIGHT = 1500;
+	public static int LIST_WIDTH = 400;
+	public static int LIST_HEIGHT = 600;
 	
 	public static int item_toscroll = 49 ;
 	
 	private Font mFont;
-
+	
+	private float ratio ;
+	
 	@Override
 	public EngineOptions onCreateEngineOptions() {
+		DisplayMetrics metrics = getResources().getDisplayMetrics();
+		CAMERA_WIDTH = metrics.widthPixels;
+		CAMERA_HEIGHT = metrics.heightPixels;
+		
+		ratio  = RatioUtils.calculatorRatioScreen(this, true);
+		LIST_WIDTH = (int)(LIST_WIDTH * ratio);
+		LIST_HEIGHT =(int)( LIST_HEIGHT * ratio);
+		
 		final Camera camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
 
 		return new EngineOptions(true, ScreenOrientation.PORTRAIT_FIXED, new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), camera);
@@ -43,7 +55,7 @@ public class TestActivity extends SimpleBaseGameActivity{
 
 	@Override
 	protected void onCreateResources() {
-		this.mFont = FontFactory.create(this.getFontManager(), this.getTextureManager(), 256, 256, Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 32);
+		this.mFont = FontFactory.create(this.getFontManager(), this.getTextureManager(), (int)(256*ratio), (int)(256*ratio), Typeface.create(Typeface.DEFAULT, Typeface.BOLD), (int)(32*ratio));
 		this.mFont.load();
 	}
 	
