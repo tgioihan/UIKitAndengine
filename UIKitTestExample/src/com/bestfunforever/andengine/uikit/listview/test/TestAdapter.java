@@ -32,7 +32,7 @@ public class TestAdapter extends SimpleAdapter{
 	public IAreaShape getView(int pos, IAreaShape view) {
 		Log.d(Tag,Tag+" getView "+ pos+" "+view);
 		if(view == null){
-			view = new ItemView(pos, font, getWidth(), getHeight(), vertexBufferObjectManager);
+			view = new ItemView(pos, font, getChildWidth(), getChildHeight(), vertexBufferObjectManager);
 		}
 		if(pos%2 == 0){
 			((ItemView)view).setColor(Color.GREEN);
@@ -45,13 +45,13 @@ public class TestAdapter extends SimpleAdapter{
 	}
 
 	@Override
-	public int getWidth() {
+	public int getChildWidth() {
 		// TODO Auto-generated method stub
 		return TestActivity.LIST_WIDTH;
 	}
 
 	@Override
-	public int getHeight() {
+	public int getChildHeight() {
 		// TODO Auto-generated method stub
 		return TestActivity.LIST_HEIGHT/7;
 	}

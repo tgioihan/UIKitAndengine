@@ -35,6 +35,8 @@ public class ListView extends ClipingRectangle {
 	private VelocityTracker velocityTracker;
 	private Fillinger mFillinger;
 
+	private int maxItemVisible;
+
 	public ListView(SimpleBaseGameActivity Context, float pX, float pY, float pWidth, float pHeight,
 			VertexBufferObjectManager pVertexBufferObjectManager) {
 		super(pX, pY, pWidth, pHeight, pVertexBufferObjectManager);
@@ -99,14 +101,14 @@ public class ListView extends ClipingRectangle {
 		mChilds.clear();
 		mFirstPosition = mSelection;
 		final int totalItem = mAdapter.getCount();
-		int maxItemVisible = trackMaxItemVisible();
+		maxItemVisible = trackMaxItemVisible();
 		if (totalItem - maxItemVisible < mFirstPosition) {
 			if (mFirstPosition < maxItemVisible) {
 				mFirstPosition = 0;
 				top = 0;
 			} else if (mFirstPosition > maxItemVisible) {
 				mFirstPosition = totalItem - 1;
-				top = getHeight() - mAdapter.getHeight();
+				top = getHeight() - mAdapter.getChildHeight();
 			}
 		}
 
@@ -119,13 +121,8 @@ public class ListView extends ClipingRectangle {
 		selectionFlag = false;
 	}
 
-	private float getDiffTopForSelection() {
-		int maxItemVisible = trackMaxItemVisible();
-		return 0;
-	}
-
 	private int trackMaxItemVisible() {
-		return (int) (getHeight() / mAdapter.getHeight());
+		return (int) (getHeight() / mAdapter.getChildHeight());
 	}
 
 	private IAreaShape makeAndAddView(int position, float top, int positionToAdd) {
@@ -146,8 +143,8 @@ public class ListView extends ClipingRectangle {
 		IAreaShape view = mRecycler.getScrapView(position, type);
 		view = mAdapter.getView(position, view);
 		view.setTag(type);
-		view.setWidth(mAdapter.getWidth());
-		view.setHeight(mAdapter.getHeight());
+		view.setWidth(mAdapter.getChildWidth());
+		view.setHeight(mAdapter.getChildHeight());
 		return view;
 	}
 
@@ -267,7 +264,7 @@ public class ListView extends ClipingRectangle {
 			if (down) {
 				for (int i = mChilds.size() - 1; i >= 0; i--) {
 					final IAreaShape view = mChilds.get(i);
-					if (view.getY() + diffY <= getHeight() + mAdapter.getHeight()) {
+					if (view.getY() + diffY <= getHeight() + mAdapter.getChildHeight()) {
 						break;
 					} else {
 						// add view to recycle
@@ -281,7 +278,7 @@ public class ListView extends ClipingRectangle {
 				for (int i = 0; i < childCount; i++) {
 					final IAreaShape view = mChilds.get(i);
 
-					if (view.getY() + view.getHeight() + diffY + mAdapter.getHeight() >= 0) {
+					if (view.getY() + view.getHeight() + diffY + mAdapter.getChildHeight() >= 0) {
 						break;
 					} else {
 						// add view to recycle
@@ -322,9 +319,9 @@ public class ListView extends ClipingRectangle {
 
 	private void fillUp(int position, float startOffset) {
 		// TODO Auto-generated method stub
-		while (startOffset > -mAdapter.getHeight() && position >= 0) {
+		while (startOffset > -mAdapter.getChildHeight() && position >= 0) {
 			mFirstPosition = position;
-			IAreaShape view = makeAndAddView(position, startOffset - mAdapter.getHeight(), 0);
+			IAreaShape view = makeAndAddView(position, startOffset - mAdapter.getChildHeight(), 0);
 			startOffset -= view.getHeight();
 			position -= 1;
 
@@ -332,7 +329,7 @@ public class ListView extends ClipingRectangle {
 	}
 
 	private void fillDown(int position, float startOffset) {
-		while (startOffset < getHeight() + mAdapter.getHeight() && position < mAdapter.getCount()) {
+		while (startOffset < getHeight() + mAdapter.getChildHeight() && position < mAdapter.getCount()) {
 			IAreaShape view = makeAndAddView(position, startOffset, mChilds.size());
 			startOffset += view.getHeight();
 			position += 1;
@@ -366,8 +363,8 @@ public class ListView extends ClipingRectangle {
 		}
 		if (mAdapter != null && mAdapter.getCount() > 0 && mChilds.size() > 0) {
 			int diffPos = mSelection - mFirstPosition;
-			final float diffY = diffPos * mAdapter.getHeight() - diffTop;
-			if (scroll) {
+			final float diffY = diffPos * mAdapter.getChildHeight() - diffTop;
+			if (scroll&&(mFirstPosition<mSelection&& diffPos<maxItemVisible)) {
 				mFillinger.scroll(0, (int) mChilds.get(0).getY(), 0, (int) diffY);
 			} else {
 				selectionFlag = true;
