@@ -80,7 +80,7 @@ public class TestActivity extends SimpleBaseGameActivity{
 					runOnUiThread(new Runnable() {
 						public void run() {
 							Toast.makeText(TestActivity.this, "scroll list to position  "+ item_toscroll , Toast.LENGTH_SHORT).show();
-							mListView.setSelectionFromTop(item_toscroll, 0, false);
+							mListView.setSelectionFromTop(item_toscroll, 20, false);
 							item_toscroll = rand.nextInt(50);
 							(TestActivity.this.mText).setText("click to scroll to item "+ item_toscroll);
 						}

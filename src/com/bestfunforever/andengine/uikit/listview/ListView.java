@@ -98,20 +98,15 @@ public class ListView extends ClipingRectangle {
 		}
 		mChilds.clear();
 		mFirstPosition = mSelection;
-		if (top < 0) {
-			mFirstPosition--;
-		} else if (top > 0) {
-			mFirstPosition++;
-		}
 		final int totalItem = mAdapter.getCount();
 		int maxItemVisible = trackMaxItemVisible();
-		if(totalItem -maxItemVisible < mFirstPosition ){
-			if(mFirstPosition < maxItemVisible){
-				mFirstPosition= 0;
+		if (totalItem - maxItemVisible < mFirstPosition) {
+			if (mFirstPosition < maxItemVisible) {
+				mFirstPosition = 0;
 				top = 0;
-			}else if(mFirstPosition > maxItemVisible){
-				mFirstPosition= totalItem-1;
-				top= getHeight()-mAdapter.getHeight();
+			} else if (mFirstPosition > maxItemVisible) {
+				mFirstPosition = totalItem - 1;
+				top = getHeight() - mAdapter.getHeight();
 			}
 		}
 
@@ -130,7 +125,7 @@ public class ListView extends ClipingRectangle {
 	}
 
 	private int trackMaxItemVisible() {
-		return (int) (getHeight() / mAdapter.getHeight()) ;
+		return (int) (getHeight() / mAdapter.getHeight());
 	}
 
 	private IAreaShape makeAndAddView(int position, float top, int positionToAdd) {
@@ -359,6 +354,12 @@ public class ListView extends ClipingRectangle {
 			return;
 		}
 		mSelection = selection;
+		if (diffTop < 0) {
+			diffTop = 0;
+		}
+		if (diffTop > getHeight()) {
+			diffTop = getHeight();
+		}
 		this.mDiffTopForSelection = diffTop;
 		if (mFirstPosition == mSelection) {
 			return;
