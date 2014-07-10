@@ -1,6 +1,5 @@
 package com.bestfunforever.andengine.uikit.listview;
 
-import org.andengine.entity.IEntity;
 import org.andengine.entity.shape.IAreaShape;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
@@ -61,7 +60,6 @@ public class ListView extends ClipingRectangle {
 
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
 				mHandler = new Handler();
 			}
 		});
@@ -75,37 +73,64 @@ public class ListView extends ClipingRectangle {
 		mRecycler.clear();
 		mRecycler.setViewTypeCount(mAdapter.getViewTypeCount());
 		this.mAdapter.registerDataSetObserver(mDataSetObserver);
-		removeAllView(true);
-	}
-
-	private void removeAllView(boolean layout) {
 		mContext.runOnUpdateThread(new Runnable() {
 
 			@Override
 			public void run() {
-//				mchil
-				for (IEntity entity : mChilds) {
-					detachChild(entity);
-				}
-				mChilds.clear();
-				mRecycler.clear();
-				mChilds.clear();
 				layoutChildrent();
-				
 			}
 		});
 	}
 
 	private void layoutChildrent() {
 		float top = 0;
-		int position = mFirstPosition;
-		while (top < getHeight() && position < mAdapter.getCount()) {
-			IAreaShape view = makeAndAddView(position, top, mChilds.size());
-			top += view.getHeight();
-			position++;
+		if (selectionFlag) {
+			top = mDiffTopForSelection;
+		} else {
+			if (mChilds.size() > 0) {
+				top = mChilds.getFirst().getY();
+			}
 		}
 
+		for (IAreaShape entity : mChilds) {
+			mRecycler.addScrapView(entity);
+			detachChild(entity);
+		}
+		mChilds.clear();
+		mFirstPosition = mSelection;
+		if (top < 0) {
+			mFirstPosition--;
+		} else if (top > 0) {
+			mFirstPosition++;
+		}
+		final int totalItem = mAdapter.getCount();
+		int maxItemVisible = trackMaxItemVisible();
+		if(totalItem -maxItemVisible < mFirstPosition ){
+			if(mFirstPosition < maxItemVisible){
+				mFirstPosition= 0;
+				top = 0;
+			}else if(mFirstPosition > maxItemVisible){
+				mFirstPosition= totalItem-1;
+				top= getHeight()-mAdapter.getHeight();
+			}
+		}
+
+		// init view for first view ( could be selection)
+		makeAndAddView(mFirstPosition, top, 0);
+		fillGap(true);
+		fillGap(false);
+
 		dataChanged = false;
+		selectionFlag = false;
+	}
+
+	private float getDiffTopForSelection() {
+		int maxItemVisible = trackMaxItemVisible();
+		return 0;
+	}
+
+	private int trackMaxItemVisible() {
+		return (int) (getHeight() / mAdapter.getHeight()) ;
 	}
 
 	private IAreaShape makeAndAddView(int position, float top, int positionToAdd) {
@@ -134,6 +159,16 @@ public class ListView extends ClipingRectangle {
 	private float initialY;
 	private float currentY;
 
+	private boolean selectionFlag;
+
+	private float mDiffTopForSelection;
+
+	private static final float MIN_DISTANCE_TO_SCROLL = 20;
+
+	private boolean scrollFlag = false;
+
+	public static final int INVALID_POSTION = -1;
+
 	@Override
 	public boolean onAreaTouched(TouchEvent event, float pTouchAreaLocalX, float pTouchAreaLocalY) {
 		if (velocityTracker == null) { // If we do not have velocity tracker
@@ -141,33 +176,55 @@ public class ListView extends ClipingRectangle {
 		}
 		final MotionEvent motionEvent = event.getMotionEvent();
 		velocityTracker.addMovement(motionEvent); // add this movement to it
+		Log.d(TAG, TAG + " mFirstPos " + mFirstPosition + " childcount " + mChilds.size());
 
 		switch (event.getAction()) {
 		case TouchEvent.ACTION_DOWN:
+			scrollFlag = false;
 			initialY = currentY = event.getY();
 			stopMovingMotion();
 			break;
 
 		case TouchEvent.ACTION_MOVE:
 			final float diffY = event.getY() - currentY;
+			final float totalDiff = event.getY() - initialY;
 			currentY = event.getY();
-			mContext.runOnUpdateThread(new Runnable() {
-
-				@Override
-				public void run() {
-					scrollByY(diffY);
+			if (!scrollFlag) {
+				if (Math.abs(totalDiff) > MIN_DISTANCE_TO_SCROLL) {
+					scrollFlag = true;
 				}
-			});
+			} else {
+				mContext.runOnUpdateThread(new Runnable() {
+
+					@Override
+					public void run() {
+						scrollByY(diffY);
+					}
+				});
+			}
 
 			break;
 
 		case TouchEvent.ACTION_UP:
-			velocityTracker.computeCurrentVelocity(1000);
-			int initialVelocity = (int) velocityTracker.getYVelocity();
-			if (Math.abs(initialVelocity) > 0) {
-				// start filling
-				mFillinger.fling(0, (int) event.getY(), -initialVelocity);
+			if (scrollFlag) {
+				velocityTracker.computeCurrentVelocity(1000);
+				int initialVelocity = (int) velocityTracker.getYVelocity();
+				if (Math.abs(initialVelocity) > 0) {
+					// start filling
+					mFillinger.fling(0, (int) event.getY(), -initialVelocity);
+				}
+			} else {
+				if (onItemClickListenner != null) {
+					int position = getPositionByY(event.getX(), event.getY());
+					if (position != INVALID_POSTION) {
+						final IAreaShape view = mChilds.get(position);
+						position = mFirstPosition + position;
+						onItemClickListenner.onClick(view, position);
+					}
+				}
+
 			}
+
 			velocityTracker.recycle();
 			break;
 
@@ -176,6 +233,17 @@ public class ListView extends ClipingRectangle {
 		}
 
 		return true;
+	}
+
+	private int getPositionByY(float x, float y) {
+		final int childCount = mChilds.size();
+		for (int i = 0; i < childCount; i++) {
+			IAreaShape view = mChilds.get(i);
+			if (view.contains(x, y)) {
+				return i;
+			}
+		}
+		return INVALID_POSTION;
 	}
 
 	/**
@@ -195,7 +263,7 @@ public class ListView extends ClipingRectangle {
 			moveCurrentItem(diffY);
 		} else {
 			if ((mFirstPosition == 0 && firstTop + diffY >= 0 && diffY > 0)
-					|| (mFirstPosition + childCount - 1 == mAdapter.getCount() && lastBottom + diffY < getHeight())
+					|| (mFirstPosition + childCount == mAdapter.getCount() && lastBottom + diffY < getHeight())
 					&& diffY < 0) {
 				// no need track mmotion
 				return;
@@ -269,7 +337,7 @@ public class ListView extends ClipingRectangle {
 	}
 
 	private void fillDown(int position, float startOffset) {
-		while (startOffset < getHeight() + mAdapter.getHeight() && position <= mAdapter.getCount()) {
+		while (startOffset < getHeight() + mAdapter.getHeight() && position < mAdapter.getCount()) {
 			IAreaShape view = makeAndAddView(position, startOffset, mChilds.size());
 			startOffset += view.getHeight();
 			position += 1;
@@ -283,23 +351,25 @@ public class ListView extends ClipingRectangle {
 	}
 
 	public void setSelection(int selection) {
-		setSelectionFromTop(selection, 0,false);
+		setSelectionFromTop(selection, 0, false);
 	}
 
-	public void setSelectionFromTop(int selection, float diffTop,boolean scroll) {
-		if(mSelection > mAdapter.getCount()){
+	public void setSelectionFromTop(int selection, float diffTop, boolean scroll) {
+		if (mSelection > mAdapter.getCount()) {
 			return;
 		}
 		mSelection = selection;
-		if(mFirstPosition == mSelection){
+		this.mDiffTopForSelection = diffTop;
+		if (mFirstPosition == mSelection) {
 			return;
 		}
-		if(mAdapter!=null && mAdapter.getCount()>0&& mChilds.size()>0){
+		if (mAdapter != null && mAdapter.getCount() > 0 && mChilds.size() > 0) {
 			int diffPos = mSelection - mFirstPosition;
-			final float diffY = diffPos*mAdapter.getHeight();
-			if(scroll){
-//				mFillinger.scroll(startX, startY, dx, dy);
-			}else{
+			final float diffY = diffPos * mAdapter.getHeight() - diffTop;
+			if (scroll) {
+				mFillinger.scroll(0, (int) mChilds.get(0).getY(), 0, (int) diffY);
+			} else {
+				selectionFlag = true;
 				layoutChildrent();
 			}
 		}
@@ -313,6 +383,14 @@ public class ListView extends ClipingRectangle {
 
 	private void stopMovingMotion() {
 		mHandler.removeCallbacks(mFillinger);
+	}
+
+	public OnItemClickListenner getOnItemClickListenner() {
+		return onItemClickListenner;
+	}
+
+	public void setOnItemClickListenner(OnItemClickListenner onItemClickListenner) {
+		this.onItemClickListenner = onItemClickListenner;
 	}
 
 	public class Fillinger implements Runnable {
@@ -330,9 +408,19 @@ public class ListView extends ClipingRectangle {
 			post(this);
 			Log.d(tag, tag + " duration " + mScroller.getDuration() + " initialVelocity " + initialVelocity);
 		}
-		
-		public void scroll(int startX, int startY, int dx, int dy){
-//			mScroller.startScroll(startX, startY, dx, dy, duration);
+
+		/**
+		 * ratio by 480 * 800
+		 */
+		private static final int defaultDurationPerScreenHeight = 1000;
+
+		public void scroll(int startX, int startY, int dx, int dy) {
+			int duration = dy / 480 * defaultDurationPerScreenHeight;
+			if (duration > defaultDurationPerScreenHeight) {
+				duration = defaultDurationPerScreenHeight;
+			}
+			mScroller.startScroll(startX, startY, dx, dy, duration);
+			post(this);
 		}
 
 		@Override
@@ -356,5 +444,11 @@ public class ListView extends ClipingRectangle {
 			}
 		}
 
+	}
+
+	private OnItemClickListenner onItemClickListenner;
+
+	public interface OnItemClickListenner {
+		public void onClick(IAreaShape view, int position);
 	}
 }

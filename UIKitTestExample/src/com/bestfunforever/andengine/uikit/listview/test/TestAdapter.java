@@ -53,7 +53,7 @@ public class TestAdapter extends SimpleAdapter{
 	@Override
 	public int getHeight() {
 		// TODO Auto-generated method stub
-		return 100;
+		return TestActivity.LIST_HEIGHT/7;
 	}
 
 	@Override
