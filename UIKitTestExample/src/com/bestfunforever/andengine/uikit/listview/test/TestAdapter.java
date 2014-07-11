@@ -25,7 +25,7 @@ public class TestAdapter extends SimpleAdapter{
 	@Override
 	public int getCount() {
 		// TODO Auto-generated method stub
-		return 50;
+		return 8;
 	}
 
 	@Override

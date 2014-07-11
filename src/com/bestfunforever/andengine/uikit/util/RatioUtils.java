@@ -8,8 +8,8 @@ public class RatioUtils {
 	public static final int DEFAULT_SCREEN_WIDTH_PORTRAIT = 480;
 	public static final int DEFAULT_SCREEN_HEIGHT_PORTRAIT = 800;
 
-	public static final int DEFAULT_SCREEN_WIDTH_LANSCAPE = 480;
-	public static final int DEFAULT_SCREEN_HEIGHT_LANSCAPE = 320;
+	public static final int DEFAULT_SCREEN_WIDTH_LANSCAPE = 800;
+	public static final int DEFAULT_SCREEN_HEIGHT_LANSCAPE = 480;
 
 	public static float calculatorRatioScreen(Activity activity, boolean portrait) {
 		float ratio = -1;
