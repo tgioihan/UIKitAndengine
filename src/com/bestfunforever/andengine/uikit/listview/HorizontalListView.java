@@ -109,7 +109,7 @@ public class HorizontalListView extends ClipingRectangle {
 			detachChild(entity);
 		}
 		mChilds.clear();
-		
+
 		// init view for first view ( could be selection)
 		makeAndAddView(mFirstPosition, left, 0);
 		fillGap(true);
@@ -199,7 +199,7 @@ public class HorizontalListView extends ClipingRectangle {
 				int initialVelocity = (int) velocityTracker.getXVelocity();
 				if (Math.abs(initialVelocity) > 0) {
 					// start filling
-					mFillinger.fling((int) event.getX(),0, -initialVelocity);
+					mFillinger.fling((int) event.getX(), 0, -initialVelocity);
 				}
 			} else {
 				if (onItemClickListenner != null) {
@@ -246,14 +246,13 @@ public class HorizontalListView extends ClipingRectangle {
 		final float lastRight = mChilds.getLast().getX() + mChilds.getLast().getWidth();
 		final boolean right = diffX > 0;
 		if ((mFirstPosition == 0 && firstLeft + diffX >= 0 && diffX > 0)
-				|| (mFirstPosition + childCount == mAdapter.getCount() && lastRight + diffX < getWidth())
-				&& diffX < 0) {
+				|| (mFirstPosition + childCount == mAdapter.getCount() && lastRight + diffX < getWidth()) && diffX < 0) {
 			// no need track mmotion
 			return;
 		}
 		if (firstLeft + diffX >= 0 && lastRight + diffX <= getWidth()) {
 			// in case first and last both in draw rectangle
-			
+
 			moveCurrentItem(diffX);
 		} else {
 
@@ -341,6 +340,11 @@ public class HorizontalListView extends ClipingRectangle {
 	}
 
 	public void setSelectionFromLeft(int selection, float diffLeft, boolean scroll) {
+		if (mAdapter == null) {
+			mFirstPosition = mSelection = selection;
+			this.mDiffLeftForSelection = diffLeft;
+			return;
+		}
 		if (mSelection > mAdapter.getCount()) {
 			return;
 		}
@@ -358,8 +362,8 @@ public class HorizontalListView extends ClipingRectangle {
 		if (mAdapter != null && mAdapter.getCount() > 0 && mChilds.size() > 0) {
 			int diffPos = mSelection - mFirstPosition;
 			final float diffX = diffPos * mAdapter.getChildWidth() - diffLeft;
-			if (scroll&&(mFirstPosition<mSelection&& diffPos<maxItemVisible)) {
-				mFillinger.scroll((int) mChilds.get(0).getX(),0,(int) diffX, 0);
+			if (scroll && (mFirstPosition < mSelection && diffPos < maxItemVisible)) {
+				mFillinger.scroll((int) mChilds.get(0).getX(), 0, (int) diffX, 0);
 			} else {
 				selectionFlag = true;
 				layoutChildrent();

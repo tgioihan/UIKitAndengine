@@ -345,6 +345,11 @@ public class ListView extends ClipingRectangle {
 	}
 
 	public void setSelectionFromTop(int selection, float diffTop, boolean scroll) {
+		if(mAdapter == null){
+			mFirstPosition = mSelection = selection;
+			this.mDiffTopForSelection = diffTop;
+			return;
+		}
 		if (mSelection > mAdapter.getCount()) {
 			return;
 		}

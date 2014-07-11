@@ -25,7 +25,7 @@ public class TestHorizontalAdapter extends SimpleAdapter{
 	@Override
 	public int getCount() {
 		// TODO Auto-generated method stub
-		return 5;
+		return 50;
 	}
 
 	@Override

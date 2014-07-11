@@ -99,8 +99,8 @@ public class TestActivity extends SimpleBaseGameActivity {
 		mListView = new ListView(this, CAMERA_WIDTH / 2 - LIST_WIDTH / 2, CAMERA_HEIGHT / 2 - LIST_HEIGHT / 2,
 				LIST_WIDTH, LIST_HEIGHT, getVertexBufferObjectManager());
 		TestAdapter testAdapter = new TestAdapter(getVertexBufferObjectManager(), mFont);
-		mListView.setAdapter(testAdapter);
 		mListView.setSelection(5);
+		mListView.setAdapter(testAdapter);
 		mListView.setOnItemClickListenner(new OnItemClickListenner() {
 
 			@Override
@@ -119,8 +119,8 @@ public class TestActivity extends SimpleBaseGameActivity {
 				mListView.getY() + mListView.getHeight() + 10, LIST_WIDTH_HORIZONTAL, LIST_HEIGHT_HORIZONTAL,
 				getVertexBufferObjectManager());
 		TestHorizontalAdapter horizontalAdapter = new TestHorizontalAdapter(getVertexBufferObjectManager(), mFont);
-		horizontalListView.setAdapter(horizontalAdapter);
 		horizontalListView.setSelection(5);
+		horizontalListView.setAdapter(horizontalAdapter);
 		horizontalListView.setOnItemClickListenner(new OnItemClickListenner() {
 
 			@Override
