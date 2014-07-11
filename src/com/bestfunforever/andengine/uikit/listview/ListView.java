@@ -88,6 +88,18 @@ public class ListView extends ClipingRectangle {
 		float top = 0;
 		if (selectionFlag) {
 			top = mDiffTopForSelection;
+			mFirstPosition = mSelection;
+			final int totalItem = mAdapter.getCount();
+			maxItemVisible = trackMaxItemVisible();
+			if (totalItem - maxItemVisible < mFirstPosition) {
+				if (mFirstPosition < maxItemVisible) {
+					mFirstPosition = 0;
+					top = 0;
+				} else if (mFirstPosition > maxItemVisible) {
+					mFirstPosition = totalItem - 1;
+					top = getHeight() - mAdapter.getChildHeight();
+				}
+			}
 		} else {
 			if (mChilds.size() > 0) {
 				top = mChilds.getFirst().getY();
@@ -99,19 +111,7 @@ public class ListView extends ClipingRectangle {
 			detachChild(entity);
 		}
 		mChilds.clear();
-		mFirstPosition = mSelection;
-		final int totalItem = mAdapter.getCount();
-		maxItemVisible = trackMaxItemVisible();
-		if (totalItem - maxItemVisible < mFirstPosition) {
-			if (mFirstPosition < maxItemVisible) {
-				mFirstPosition = 0;
-				top = 0;
-			} else if (mFirstPosition > maxItemVisible) {
-				mFirstPosition = totalItem - 1;
-				top = getHeight() - mAdapter.getChildHeight();
-			}
-		}
-
+		
 		// init view for first view ( could be selection)
 		makeAndAddView(mFirstPosition, top, 0);
 		fillGap(true);
