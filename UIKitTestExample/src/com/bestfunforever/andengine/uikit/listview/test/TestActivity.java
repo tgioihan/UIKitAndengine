@@ -96,7 +96,11 @@ public class TestActivity extends SimpleBaseGameActivity {
 		Scene scene = new Scene();
 		scene.setBackground(new Background(Color.WHITE));
 		Log.d("","CAMERA_WIDTH "+CAMERA_WIDTH+" CAMERA_HEIGHT "+CAMERA_HEIGHT+ "ratio  "+ ratio +" LIST_WIDTH "+LIST_WIDTH +" LIST_HEIGHT "+LIST_HEIGHT);
+<<<<<<< HEAD
 		mListView = new ListView(this, CAMERA_WIDTH / 2 - LIST_WIDTH / 2, 60*ratio,
+=======
+		mListView = new ListView(this, CAMERA_WIDTH / 2 - LIST_WIDTH / 2, CAMERA_HEIGHT / 2 - LIST_HEIGHT / 2,
+>>>>>>> 7401ddd0c3492e7d5e5c7d2987d9e8a8efed1c4e
 				LIST_WIDTH, LIST_HEIGHT, getVertexBufferObjectManager());
 		TestAdapter testAdapter = new TestAdapter(getVertexBufferObjectManager(), mFont);
 		mListView.setSelection(5);
