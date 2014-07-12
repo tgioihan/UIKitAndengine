@@ -5,7 +5,6 @@ import org.andengine.entity.primitive.Rectangle;
 import org.andengine.opengl.util.GLState;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.Constants;
-import org.andengine.util.color.Color;
 
 import android.opengl.GLES20;
 

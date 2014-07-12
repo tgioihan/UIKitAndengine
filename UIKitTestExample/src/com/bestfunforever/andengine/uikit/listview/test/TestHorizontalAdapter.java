@@ -9,14 +9,14 @@ import android.util.Log;
 
 import com.bestfunforever.andengine.uikit.listview.SimpleAdapter;
 
-public class TestAdapter extends SimpleAdapter{
+public class TestHorizontalAdapter extends SimpleAdapter{
 	
-	public static final String Tag = "TestAdapter";
+	public static final String Tag = "TestHorizontalAdapter";
 	
 	VertexBufferObjectManager vertexBufferObjectManager;
 	Font font;
 
-	public TestAdapter(VertexBufferObjectManager vertexBufferObjectManager, Font font) {
+	public TestHorizontalAdapter(VertexBufferObjectManager vertexBufferObjectManager, Font font) {
 		super();
 		this.vertexBufferObjectManager = vertexBufferObjectManager;
 		this.font = font;
@@ -47,13 +47,13 @@ public class TestAdapter extends SimpleAdapter{
 	@Override
 	public int getChildWidth() {
 		// TODO Auto-generated method stub
-		return TestActivity.LIST_WIDTH;
+		return TestActivity.LIST_WIDTH_HORIZONTAL/4;
 	}
 
 	@Override
 	public int getChildHeight() {
 		// TODO Auto-generated method stub
-		return TestActivity.LIST_HEIGHT/7;
+		return TestActivity.LIST_HEIGHT_HORIZONTAL;
 	}
 
 	@Override

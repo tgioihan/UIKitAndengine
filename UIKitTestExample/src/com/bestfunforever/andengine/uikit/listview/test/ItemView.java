@@ -4,6 +4,7 @@ import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.text.Text;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
+import org.andengine.util.color.Color;
 
 public class ItemView extends Rectangle {
 
@@ -18,6 +19,7 @@ public class ItemView extends Rectangle {
 		this.mFont = font;
 
 		mText = new Text(getWidth() / 2, getHeight() / 2, mFont, "", 5, getVertexBufferObjectManager());
+		mText.setColor(Color.RED);
 		attachChild(mText);
 	}
 

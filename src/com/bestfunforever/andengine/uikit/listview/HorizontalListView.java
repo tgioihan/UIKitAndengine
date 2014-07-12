@@ -15,7 +15,7 @@ import android.widget.Scroller;
 
 import com.bestfunforever.andengine.uikit.entity.ClipingRectangle;
 
-public class ListView extends ClipingRectangle {
+public class HorizontalListView extends ClipingRectangle {
 
 	private static final String TAG = "ListView";
 
@@ -35,7 +35,7 @@ public class ListView extends ClipingRectangle {
 
 	private int maxItemVisible;
 
-	public ListView(SimpleBaseGameActivity Context, float pX, float pY, float pWidth, float pHeight,
+	public HorizontalListView(SimpleBaseGameActivity Context, float pX, float pY, float pWidth, float pHeight,
 			VertexBufferObjectManager pVertexBufferObjectManager) {
 		super(pX, pY, pWidth, pHeight, pVertexBufferObjectManager);
 		this.mContext = Context;
@@ -83,24 +83,24 @@ public class ListView extends ClipingRectangle {
 	}
 
 	private void layoutChildrent() {
-		float top = 0;
+		float left = 0;
 		if (selectionFlag) {
-			top = mDiffTopForSelection;
+			left = mDiffLeftForSelection;
 			mFirstPosition = mSelection;
 			final int totalItem = mAdapter.getCount();
 			maxItemVisible = trackMaxItemVisible();
 			if (totalItem - maxItemVisible < mFirstPosition) {
 				if (mFirstPosition < maxItemVisible) {
 					mFirstPosition = 0;
-					top = 0;
+					left = 0;
 				} else if (mFirstPosition > maxItemVisible) {
 					mFirstPosition = totalItem - 1;
-					top = getHeight() - mAdapter.getChildHeight();
+					left = getWidth() - mAdapter.getChildWidth();
 				}
 			}
 		} else {
 			if (mChilds.size() > 0) {
-				top = mChilds.getFirst().getY();
+				left = mChilds.getFirst().getX();
 			}
 		}
 
@@ -109,9 +109,9 @@ public class ListView extends ClipingRectangle {
 			detachChild(entity);
 		}
 		mChilds.clear();
-		
+
 		// init view for first view ( could be selection)
-		makeAndAddView(mFirstPosition, top, 0);
+		makeAndAddView(mFirstPosition, left, 0);
 		fillGap(true);
 		fillGap(false);
 
@@ -120,17 +120,17 @@ public class ListView extends ClipingRectangle {
 	}
 
 	private int trackMaxItemVisible() {
-		return (int) (getHeight() / mAdapter.getChildHeight());
+		return (int) (getWidth() / mAdapter.getChildWidth());
 	}
 
-	private IAreaShape makeAndAddView(int position, float top, int positionToAdd) {
+	private IAreaShape makeAndAddView(int position, float left, int positionToAdd) {
 
 		IAreaShape mView = mRecycler.getActiveView(position);
 		if (mView != null && dataChanged) {
 			return mView;
 		}
 		mView = obtainView(position);
-		mView.setY(top);
+		mView.setX(left);
 		mChilds.add(positionToAdd, mView);
 		attachChild(mView);
 		return mView;
@@ -141,17 +141,15 @@ public class ListView extends ClipingRectangle {
 		IAreaShape view = mRecycler.getScrapView(position, type);
 		view = mAdapter.getView(position, view);
 		view.setTag(type);
-		view.setWidth(mAdapter.getChildWidth());
-		view.setHeight(mAdapter.getChildHeight());
 		return view;
 	}
 
-	private float initialY;
-	private float currentY;
+	private float initialX;
+	private float currentX;
 
 	private boolean selectionFlag;
 
-	private float mDiffTopForSelection;
+	private float mDiffLeftForSelection;
 
 	private static final float MIN_DISTANCE_TO_SCROLL = 20;
 
@@ -171,14 +169,14 @@ public class ListView extends ClipingRectangle {
 		switch (event.getAction()) {
 		case TouchEvent.ACTION_DOWN:
 			scrollFlag = false;
-			initialY = currentY = event.getY();
+			initialX = currentX = event.getX();
 			stopMovingMotion();
 			break;
 
 		case TouchEvent.ACTION_MOVE:
-			final float diffY = event.getY() - currentY;
-			final float totalDiff = event.getY() - initialY;
-			currentY = event.getY();
+			final float diffX = event.getX() - currentX;
+			final float totalDiff = event.getX() - initialX;
+			currentX = event.getX();
 			if (!scrollFlag) {
 				if (Math.abs(totalDiff) > MIN_DISTANCE_TO_SCROLL) {
 					scrollFlag = true;
@@ -188,7 +186,7 @@ public class ListView extends ClipingRectangle {
 
 					@Override
 					public void run() {
-						scrollByY(diffY);
+						scrollByX(diffX);
 					}
 				});
 			}
@@ -198,14 +196,14 @@ public class ListView extends ClipingRectangle {
 		case TouchEvent.ACTION_UP:
 			if (scrollFlag) {
 				velocityTracker.computeCurrentVelocity(1000);
-				int initialVelocity = (int) velocityTracker.getYVelocity();
+				int initialVelocity = (int) velocityTracker.getXVelocity();
 				if (Math.abs(initialVelocity) > 0) {
 					// start filling
-					mFillinger.fling(0, (int) event.getY(), -initialVelocity);
+					mFillinger.fling((int) event.getX(), 0, -initialVelocity);
 				}
 			} else {
 				if (onItemClickListenner != null) {
-					int position = getPositionByY(event.getX(), event.getY());
+					int position = getPositionFromLocation(event.getX(), event.getY());
 					if (position != INVALID_POSTION) {
 						final IAreaShape view = mChilds.get(position);
 						position = mFirstPosition + position;
@@ -225,7 +223,7 @@ public class ListView extends ClipingRectangle {
 		return true;
 	}
 
-	private int getPositionByY(float x, float y) {
+	private int getPositionFromLocation(float x, float y) {
 		final int childCount = mChilds.size();
 		for (int i = 0; i < childCount; i++) {
 			IAreaShape view = mChilds.get(i);
@@ -238,31 +236,30 @@ public class ListView extends ClipingRectangle {
 
 	/**
 	 * @param diffX
-	 * @param diffY
 	 */
-	private void scrollByY(float diffY) {
+	private void scrollByX(float diffX) {
 		final int childCount = mChilds.size();
 		if (childCount == 0) {
 			return;
 		}
-		final float firstTop = mChilds.get(0).getY();
-		final float lastBottom = mChilds.getLast().getY() + mChilds.getLast().getHeight();
-		final boolean down = diffY > 0;
-		if ((mFirstPosition == 0 && firstTop + diffY >= 0 && diffY > 0)
-				|| (mFirstPosition + childCount == mAdapter.getCount() && lastBottom + diffY < getHeight())
-				&& diffY < 0) {
+		final float firstLeft = mChilds.get(0).getX();
+		final float lastRight = mChilds.getLast().getX() + mChilds.getLast().getWidth();
+		final boolean right = diffX > 0;
+		if ((mFirstPosition == 0 && firstLeft + diffX >= 0 && diffX > 0)
+				|| (mFirstPosition + childCount == mAdapter.getCount() && lastRight + diffX < getWidth()) && diffX < 0) {
 			// no need track mmotion
 			return;
 		}
-		if (firstTop + diffY >= 0 && lastBottom + diffY <= getHeight()) {
+		if (firstLeft + diffX >= 0 && lastRight + diffX <= getWidth()) {
 			// in case first and last both in draw rectangle
-			moveCurrentItem(diffY);
+
+			moveCurrentItem(diffX);
 		} else {
 
-			if (down) {
+			if (right) {
 				for (int i = mChilds.size() - 1; i >= 0; i--) {
 					final IAreaShape view = mChilds.get(i);
-					if (view.getY() + diffY <= getHeight() + mAdapter.getChildHeight()) {
+					if (view.getX() + diffX <= getWidth() + mAdapter.getChildWidth()) {
 						break;
 					} else {
 						// add view to recycle
@@ -276,7 +273,7 @@ public class ListView extends ClipingRectangle {
 				for (int i = 0; i < childCount; i++) {
 					final IAreaShape view = mChilds.get(i);
 
-					if (view.getY() + view.getHeight() + diffY + mAdapter.getChildHeight() >= 0) {
+					if (view.getX() + view.getWidth() + diffX + mAdapter.getChildWidth() >= 0) {
 						break;
 					} else {
 						// add view to recycle
@@ -288,48 +285,46 @@ public class ListView extends ClipingRectangle {
 			}
 
 			// move item acitive
-			moveCurrentItem(diffY);
+			moveCurrentItem(diffX);
 
 			// get scrap view to active
-			fillGap(down);
+			fillGap(right);
 		}
 
 	}
 
-	private void moveCurrentItem(float diffY) {
+	private void moveCurrentItem(float diffX) {
 		for (int i = 0; i < mChilds.size(); i++) {
 			final IAreaShape view = mChilds.get(i);
-			view.setY(view.getY() + diffY);
+			view.setX(view.getX() + diffX);
 		}
 	}
 
 	private void fillGap(boolean down) {
 		final int childCOunt = mChilds.size();
 		if (down) {
-			final float startOffset = childCOunt > 0 ? mChilds.get(0).getY() : (getHeight());
-			fillUp(mFirstPosition - 1, startOffset);
+			final float startOffset = childCOunt > 0 ? mChilds.get(0).getX() : (getWidth());
+			fillLeft(mFirstPosition - 1, startOffset);
 		} else {
-			final float startOffset = childCOunt > 0 ? (mChilds.get(childCOunt - 1).getHeight() + mChilds.get(
-					childCOunt - 1).getY()) : 0;
-			fillDown(mFirstPosition + childCOunt, startOffset);
+			final float startOffset = childCOunt > 0 ? (mChilds.get(childCOunt - 1).getWidth() + mChilds.get(
+					childCOunt - 1).getX()) : 0;
+			fillRight(mFirstPosition + childCOunt, startOffset);
 		}
 	}
 
-	private void fillUp(int position, float startOffset) {
-		// TODO Auto-generated method stub
-		while (startOffset > -mAdapter.getChildHeight() && position >= 0) {
+	private void fillLeft(int position, float startOffset) {
+		while (startOffset > -mAdapter.getChildWidth() && position >= 0) {
 			mFirstPosition = position;
-			IAreaShape view = makeAndAddView(position, startOffset - mAdapter.getChildHeight(), 0);
-			startOffset -= view.getHeight();
+			IAreaShape view = makeAndAddView(position, startOffset - mAdapter.getChildWidth(), 0);
+			startOffset -= view.getWidth();
 			position -= 1;
-
 		}
 	}
 
-	private void fillDown(int position, float startOffset) {
-		while (startOffset < getHeight() + mAdapter.getChildHeight() && position < mAdapter.getCount()) {
+	private void fillRight(int position, float startOffset) {
+		while (startOffset < getWidth() + mAdapter.getChildWidth() && position < mAdapter.getCount()) {
 			IAreaShape view = makeAndAddView(position, startOffset, mChilds.size());
-			startOffset += view.getHeight();
+			startOffset += view.getWidth();
 			position += 1;
 		}
 	}
@@ -341,34 +336,34 @@ public class ListView extends ClipingRectangle {
 	}
 
 	public void setSelection(int selection) {
-		setSelectionFromTop(selection, 0, false);
+		setSelectionFromLeft(selection, 0, false);
 	}
 
-	public void setSelectionFromTop(int selection, float diffTop, boolean scroll) {
-		if(mAdapter == null){
+	public void setSelectionFromLeft(int selection, float diffLeft, boolean scroll) {
+		if (mAdapter == null) {
 			mFirstPosition = mSelection = selection;
-			this.mDiffTopForSelection = diffTop;
+			this.mDiffLeftForSelection = diffLeft;
 			return;
 		}
 		if (mSelection > mAdapter.getCount()) {
 			return;
 		}
 		mSelection = selection;
-		if (diffTop < 0) {
-			diffTop = 0;
+		if (diffLeft < 0) {
+			diffLeft = 0;
 		}
-		if (diffTop > getHeight()) {
-			diffTop = getHeight();
+		if (diffLeft > getHeight()) {
+			diffLeft = getHeight();
 		}
-		this.mDiffTopForSelection = diffTop;
+		this.mDiffLeftForSelection = diffLeft;
 		if (mFirstPosition == mSelection) {
 			return;
 		}
 		if (mAdapter != null && mAdapter.getCount() > 0 && mChilds.size() > 0) {
 			int diffPos = mSelection - mFirstPosition;
-			final float diffY = diffPos * mAdapter.getChildHeight() - diffTop;
-			if (scroll&&(mFirstPosition<mSelection&& diffPos<maxItemVisible)) {
-				mFillinger.scroll(0, (int) mChilds.get(0).getY(), 0, (int) diffY);
+			final float diffX = diffPos * mAdapter.getChildWidth() - diffLeft;
+			if (scroll && (mFirstPosition < mSelection && diffPos < maxItemVisible)) {
+				mFillinger.scroll((int) mChilds.get(0).getX(), 0, (int) diffX, 0);
 			} else {
 				selectionFlag = true;
 				layoutChildrent();
@@ -397,15 +392,15 @@ public class ListView extends ClipingRectangle {
 	public class Fillinger implements Runnable {
 		private static final String tag = "Fillinger";
 		private Scroller mScroller;
-		private int lastY;
+		private int lastX;
 
 		public Fillinger() {
 			mScroller = new Scroller(mContext);
 		}
 
 		public void fling(int startX, int startY, int initialVelocity) {
-			lastY = startY;
-			mScroller.fling(startX, startY, 0, initialVelocity, 0, Integer.MAX_VALUE, 0, Integer.MAX_VALUE);
+			lastX = startX;
+			mScroller.fling(startX, startY, initialVelocity, 0, 0, Integer.MAX_VALUE, 0, Integer.MAX_VALUE);
 			post(this);
 			Log.d(tag, tag + " duration " + mScroller.getDuration() + " initialVelocity " + initialVelocity);
 		}
@@ -413,10 +408,10 @@ public class ListView extends ClipingRectangle {
 		/**
 		 * ratio by 480 * 800
 		 */
-		private static final int defaultDurationPerScreenHeight = 1000;
+		private static final int defaultDurationPerScreenHeight = 600;
 
 		public void scroll(int startX, int startY, int dx, int dy) {
-			int duration = dy / 480 * defaultDurationPerScreenHeight;
+			int duration = dx / 800 * defaultDurationPerScreenHeight;
 			if (duration > defaultDurationPerScreenHeight) {
 				duration = defaultDurationPerScreenHeight;
 			}
@@ -430,14 +425,14 @@ public class ListView extends ClipingRectangle {
 				return;
 			}
 			boolean more = mScroller.computeScrollOffset();
-			int currenY = mScroller.getCurrY();
-			final int diffY = lastY - currenY;
-			lastY = currenY;
+			int currenX = mScroller.getCurrX();
+			final int diffX = lastX - currenX;
+			lastX = currenX;
 			mContext.runOnUpdateThread(new Runnable() {
 
 				@Override
 				public void run() {
-					scrollByY(diffY);
+					scrollByX(diffX);
 				}
 			});
 			if (more) {
@@ -448,5 +443,4 @@ public class ListView extends ClipingRectangle {
 	}
 
 	private OnItemClickListenner onItemClickListenner;
-
 }
