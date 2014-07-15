@@ -2,6 +2,7 @@ package com.bestfunforever.andengine.uikit.util;
 
 import android.app.Activity;
 import android.util.DisplayMetrics;
+import android.util.Log;
 
 public class RatioUtils {
 
@@ -16,15 +17,16 @@ public class RatioUtils {
 		DisplayMetrics disp = new DisplayMetrics();
 		activity.getWindowManager().getDefaultDisplay().getMetrics(disp);
 		int screenWidth, screenHeight;
-		if (disp.widthPixels < disp.heightPixels) {
-			screenWidth = disp.heightPixels;
-			screenHeight = disp.widthPixels;
-		} else {
-			screenWidth = disp.widthPixels;
-			screenHeight = disp.heightPixels;
-		}
-		// screenWidth = disp.widthPixels;
-		// screenHeight = disp.heightPixels;
+//		if (disp.widthPixels < disp.heightPixels) {
+//			screenWidth = disp.heightPixels;
+//			screenHeight = disp.widthPixels;
+//		} else {
+//			screenWidth = disp.widthPixels;
+//			screenHeight = disp.heightPixels;
+//		}
+		 screenWidth = disp.widthPixels;
+		 screenHeight = disp.heightPixels;
+		Log.d("", "ratio screenWidth "+screenWidth+" screenHeight "+screenHeight);
 		int defaultWidth = 480;
 		int defaultHeight = 320;
 		if (portrait) {
