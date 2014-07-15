@@ -11,9 +11,6 @@ public interface BaseAdapter {
 	 * An item view type that causes the AdapterView to ignore the item view.
 	 * For example, this can be used if the client does not want a particular
 	 * view to be given for conversion in
-	 * {@link #getView(int, int, View, ViewGroup)}.
-	 * 
-	 * @see #getItemViewType(int, int)
 	 */
 	public final static int IGNORE_ITEM_VIEW_TYPE = -1;
 
@@ -65,8 +62,7 @@ public interface BaseAdapter {
 	public int getChildHeight();
 
 	/**
-	 * Get the type of View that will be created by
-	 * {@link #getView(int, int, View, ViewGroup)} for the specified item.
+	 * Get the type of View that will be created  for the specified item.
 	 * 
 	 * @param row
 	 *            The row of the item within the adapter's data table of the

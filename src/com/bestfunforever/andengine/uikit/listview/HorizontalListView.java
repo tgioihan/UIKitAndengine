@@ -213,9 +213,11 @@ public class HorizontalListView extends ClipingRectangle {
 
 			}
 
+			// velocityTracker.recycle();
+			break;
+		case TouchEvent.ACTION_CANCEL:
 			velocityTracker.recycle();
 			break;
-
 		default:
 			break;
 		}

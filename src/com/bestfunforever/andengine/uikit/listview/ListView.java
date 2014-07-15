@@ -215,9 +215,12 @@ public class ListView extends ClipingRectangle {
 
 			}
 
+//			velocityTracker.recycle();
+			break;
+		case TouchEvent.ACTION_CANCEL:
 			velocityTracker.recycle();
 			break;
-
+			
 		default:
 			break;
 		}
