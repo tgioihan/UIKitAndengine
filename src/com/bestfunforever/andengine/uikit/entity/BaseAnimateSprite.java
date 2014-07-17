@@ -1,19 +1,19 @@
 package com.bestfunforever.andengine.uikit.entity;
 
-import org.andengine.audio.sound.SoundManager;
-import org.andengine.entity.shape.IAreaShape;
+import org.andengine.entity.sprite.AnimatedSprite;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.region.ITextureRegion;
+import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
 import android.util.Log;
 
-public abstract class BaseSprite extends Sprite implements ISelector {
+public abstract class BaseAnimateSprite extends AnimatedSprite implements ISelector {
 
-	public BaseSprite(float pX, float pY, float pWidth, float pHeight, ITextureRegion pTextureRegion,
+	public BaseAnimateSprite(float pX, float pY, float pWidth, float pHeight, ITiledTextureRegion pTiledTextureRegion,
 			VertexBufferObjectManager pVertexBufferObjectManager) {
-		super(pX, pY, pWidth, pHeight, pTextureRegion, pVertexBufferObjectManager);
+		super(pX, pY, pWidth, pHeight, pTiledTextureRegion, pVertexBufferObjectManager);
 	}
 
 	private IClick mClickListenner;

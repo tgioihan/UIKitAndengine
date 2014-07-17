@@ -45,13 +45,13 @@ public class TestHorizontalAdapter extends SimpleAdapter{
 	}
 
 	@Override
-	public int getChildWidth() {
+	public float getChildWidth() {
 		// TODO Auto-generated method stub
 		return TestActivity.LIST_WIDTH_HORIZONTAL/4;
 	}
 
 	@Override
-	public int getChildHeight() {
+	public float getChildHeight() {
 		// TODO Auto-generated method stub
 		return TestActivity.LIST_HEIGHT_HORIZONTAL;
 	}

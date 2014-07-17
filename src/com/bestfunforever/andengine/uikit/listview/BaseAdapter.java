@@ -58,8 +58,8 @@ public interface BaseAdapter {
 	 */
 	public IAreaShape getView(int pos, IAreaShape view);
 
-	public int getChildWidth();
-	public int getChildHeight();
+	public float getChildWidth();
+	public float getChildHeight();
 
 	/**
 	 * Get the type of View that will be created  for the specified item.
