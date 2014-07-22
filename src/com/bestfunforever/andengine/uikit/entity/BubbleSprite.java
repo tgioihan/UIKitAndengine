@@ -83,12 +83,6 @@ public class BubbleSprite extends BaseSprite {
 		
 	}
 
-	public enum State {
-		NORMAL, PRESS, SELECTED,NOACTION
-	}
-
-	private State mState = State.NOACTION;
-
 	@Override
 	public void onNormalState() {
 		if (mState != State.NORMAL) {

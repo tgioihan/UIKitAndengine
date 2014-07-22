@@ -2,15 +2,19 @@ package com.bestfunforever.andengine.uikit.menu;
 
 import org.andengine.engine.camera.Camera;
 import org.andengine.entity.IEntity;
+import org.andengine.entity.modifier.IEntityModifier;
 import org.andengine.entity.modifier.IEntityModifier.IEntityModifierListener;
 import org.andengine.entity.modifier.LoopEntityModifier;
+import org.andengine.entity.modifier.MoveModifier;
 import org.andengine.entity.modifier.MoveXModifier;
 import org.andengine.entity.modifier.MoveYModifier;
 import org.andengine.entity.modifier.ParallelEntityModifier;
 import org.andengine.entity.modifier.RotationByModifier;
+import org.andengine.entity.modifier.RotationModifier;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.modifier.IModifier;
 
+import com.bestfunforever.andengine.uikit.entity.BaseSprite.State;
 import com.bestfunforever.andengine.uikit.entity.BubbleSprite;
 
 public abstract class ExpandableMenu extends BaseMenu {
@@ -22,6 +26,24 @@ public abstract class ExpandableMenu extends BaseMenu {
 	private DIRECTION mDirection = DIRECTION.RIGHT;
 
 	private float mDistanceItem = 30;
+	private IEntityModifier mMenuItemModifierWhenShow;
+	private IEntityModifier mMenuItemModifierWhenHide;
+
+	public IEntityModifier getMenuItemModifierWhenShow() {
+		return mMenuItemModifierWhenShow;
+	}
+
+	public void setMenuItemModifierWhenShow(IEntityModifier mMenuItemModifierWhenShow) {
+		this.mMenuItemModifierWhenShow = mMenuItemModifierWhenShow;
+	}
+
+	public IEntityModifier getMenuItemModifierWhenHide() {
+		return mMenuItemModifierWhenHide;
+	}
+
+	public void setMenuItemModifierWhenHide(IEntityModifier mMenuItemModifierWhenHide) {
+		this.mMenuItemModifierWhenHide = mMenuItemModifierWhenHide;
+	}
 
 	/**
 	 * ratio by 480 * 800
@@ -72,6 +94,44 @@ public abstract class ExpandableMenu extends BaseMenu {
 		}
 	}
 
+	@Override
+	protected void hide() {
+		super.show();
+		if (stage == STAGE.SHOW) {
+			if (mMenuItems.size() == 0) {
+				return;
+			}
+			for (int i = 0; i < mMenuItems.size(); i++) {
+				MenuItem menuItem = (MenuItem) mMenuItems.get(i);
+				float durationX = menuItem.getX() - mControl.getX();
+				float durationY = menuItem.getY() - mControl.getY();
+				if (mMenuItemModifierWhenHide != null) {
+					menuItem.registerEntityModifier(new ParallelEntityModifier(
+							new MoveModifier(
+									Math.max(Math.abs(durationX), Math.abs(durationY)), menuItem.getX(), mControl.getX(),
+									menuItem.getY(), mControl.getY(),new IEntityModifierListener() {
+										
+										@Override
+										public void onModifierStarted(IModifier<IEntity> pModifier, IEntity pItem) {
+											
+										}
+										
+										@Override
+										public void onModifierFinished(IModifier<IEntity> pModifier, IEntity pItem) {
+											
+										}
+									}),
+									mMenuItemModifierWhenHide
+							));
+				} else {
+					menuItem.registerEntityModifier(new MoveModifier(
+							Math.max(Math.abs(durationX), Math.abs(durationY)), menuItem.getX(), mControl.getX(),
+							menuItem.getY(), mControl.getY()));
+				}
+			}
+		}
+	}
+
 	private void createAnimationRight() {
 		float initialX = mDistanceItem;
 		for (int i = 0; i < mMenuItems.size(); i++) {
@@ -79,22 +139,45 @@ public abstract class ExpandableMenu extends BaseMenu {
 			menuItem.clearEntityModifiers();
 			float distance = initialX - menuItem.getX();
 			float duration = distance / 480 * DURATIONX_PER_SCREENSIZE;
-			menuItem.registerEntityModifier(new MoveXModifier(duration, menuItem.getX(), initialX));
-			menuItem.registerEntityModifier(new ParallelEntityModifier(new MoveXModifier(distance / 480
-					* DURATIONX_PER_SCREENSIZE, menuItem.getX(), initialX), new LoopEntityModifier(
-					new RotationByModifier(duration / (distance / 480 * DURATION_ROTATION_COUNT_PER_SCREENSIZE), 360),
-					(int) (distance / 480 * DURATION_ROTATION_COUNT_PER_SCREENSIZE), new IEntityModifierListener() {
 
-						@Override
-						public void onModifierStarted(IModifier<IEntity> pModifier, IEntity pItem) {
+			if (mMenuItemModifierWhenShow != null) {
+				menuItem.registerEntityModifier(new ParallelEntityModifier(new MoveXModifier(duration, menuItem.getX(),
+						initialX, new IEntityModifierListener() {
 
-						}
+							@Override
+							public void onModifierStarted(IModifier<IEntity> pModifier, IEntity pItem) {
 
-						@Override
-						public void onModifierFinished(IModifier<IEntity> pModifier, IEntity pItem) {
-							((MenuItem) pItem).onNormalState();
-						}
-					})));
+							}
+
+							@Override
+							public void onModifierFinished(IModifier<IEntity> pModifier, IEntity pItem) {
+								if (pItem.getRotation() != 0) {
+									pItem.registerEntityModifier(new RotationModifier(0.2f, pItem.getRotation(), 0,
+											new IEntityModifierListener() {
+
+												@Override
+												public void onModifierStarted(IModifier<IEntity> pModifier,
+														IEntity pItem) {
+
+												}
+
+												@Override
+												public void onModifierFinished(IModifier<IEntity> pModifier,
+														IEntity pItem) {
+													((MenuItem) pItem).setState(State.NOACTION);
+													((MenuItem) pItem).onNormalState();
+												}
+											}));
+								} else {
+									((MenuItem) pItem).setState(State.NOACTION);
+									((MenuItem) pItem).onNormalState();
+								}
+
+							}
+						}), mMenuItemModifierWhenShow));
+			} else {
+				menuItem.registerEntityModifier(new MoveXModifier(duration, menuItem.getX(), initialX));
+			}
 			initialX += menuItem.getWidth() + mDistanceItem;
 		}
 	}
@@ -106,22 +189,44 @@ public abstract class ExpandableMenu extends BaseMenu {
 			menuItem.clearEntityModifiers();
 			float distance = initialX - menuItem.getX();
 			float duration = distance / 480 * DURATIONX_PER_SCREENSIZE;
-			menuItem.registerEntityModifier(new MoveXModifier(duration, menuItem.getX(), initialX));
-			menuItem.registerEntityModifier(new ParallelEntityModifier(new MoveXModifier(distance / 480
-					* DURATIONX_PER_SCREENSIZE, menuItem.getX(), initialX), new LoopEntityModifier(
-					new RotationByModifier(duration / (distance / 480 * DURATION_ROTATION_COUNT_PER_SCREENSIZE), 360),
-					(int) (distance / 480 * DURATION_ROTATION_COUNT_PER_SCREENSIZE), new IEntityModifierListener() {
+			if (mMenuItemModifierWhenShow != null) {
+				menuItem.registerEntityModifier(new ParallelEntityModifier(new MoveXModifier(duration, menuItem.getX(),
+						initialX, new IEntityModifierListener() {
 
-						@Override
-						public void onModifierStarted(IModifier<IEntity> pModifier, IEntity pItem) {
+							@Override
+							public void onModifierStarted(IModifier<IEntity> pModifier, IEntity pItem) {
 
-						}
+							}
 
-						@Override
-						public void onModifierFinished(IModifier<IEntity> pModifier, IEntity pItem) {
-							((MenuItem) pItem).onNormalState();
-						}
-					})));
+							@Override
+							public void onModifierFinished(IModifier<IEntity> pModifier, IEntity pItem) {
+								if (pItem.getRotation() != 0) {
+									pItem.registerEntityModifier(new RotationModifier(0.2f, pItem.getRotation(), 0,
+											new IEntityModifierListener() {
+
+												@Override
+												public void onModifierStarted(IModifier<IEntity> pModifier,
+														IEntity pItem) {
+
+												}
+
+												@Override
+												public void onModifierFinished(IModifier<IEntity> pModifier,
+														IEntity pItem) {
+													((MenuItem) pItem).setState(State.NOACTION);
+													((MenuItem) pItem).onNormalState();
+												}
+											}));
+								} else {
+									((MenuItem) pItem).setState(State.NOACTION);
+									((MenuItem) pItem).onNormalState();
+								}
+
+							}
+						}), mMenuItemModifierWhenShow));
+			} else {
+				menuItem.registerEntityModifier(new MoveXModifier(duration, menuItem.getX(), initialX));
+			}
 			initialX -= menuItem.getWidth() + mDistanceItem;
 		}
 	}
@@ -133,22 +238,44 @@ public abstract class ExpandableMenu extends BaseMenu {
 			menuItem.clearEntityModifiers();
 			float distance = initialY - menuItem.getY();
 			float duration = distance / 480 * DURATIONX_PER_SCREENSIZE;
-			menuItem.registerEntityModifier(new MoveYModifier(duration, menuItem.getY(), initialY));
-			menuItem.registerEntityModifier(new ParallelEntityModifier(new MoveXModifier(distance / 480
-					* DURATIONX_PER_SCREENSIZE, menuItem.getX(), initialY), new LoopEntityModifier(
-					new RotationByModifier(duration / (distance / 480 * DURATION_ROTATION_COUNT_PER_SCREENSIZE), 360),
-					(int) (distance / 800 * DURATION_ROTATION_COUNT_PER_SCREENSIZE), new IEntityModifierListener() {
+			if (mMenuItemModifierWhenShow != null) {
+				menuItem.registerEntityModifier(new ParallelEntityModifier(new MoveXModifier(duration, menuItem.getY(),
+						initialY, new IEntityModifierListener() {
 
-						@Override
-						public void onModifierStarted(IModifier<IEntity> pModifier, IEntity pItem) {
+							@Override
+							public void onModifierStarted(IModifier<IEntity> pModifier, IEntity pItem) {
 
-						}
+							}
 
-						@Override
-						public void onModifierFinished(IModifier<IEntity> pModifier, IEntity pItem) {
-							((MenuItem) pItem).onNormalState();
-						}
-					})));
+							@Override
+							public void onModifierFinished(IModifier<IEntity> pModifier, IEntity pItem) {
+								if (pItem.getRotation() != 0) {
+									pItem.registerEntityModifier(new RotationModifier(0.2f, pItem.getRotation(), 0,
+											new IEntityModifierListener() {
+
+												@Override
+												public void onModifierStarted(IModifier<IEntity> pModifier,
+														IEntity pItem) {
+
+												}
+
+												@Override
+												public void onModifierFinished(IModifier<IEntity> pModifier,
+														IEntity pItem) {
+													((MenuItem) pItem).setState(State.NOACTION);
+													((MenuItem) pItem).onNormalState();
+												}
+											}));
+								} else {
+									((MenuItem) pItem).setState(State.NOACTION);
+									((MenuItem) pItem).onNormalState();
+								}
+
+							}
+						}), mMenuItemModifierWhenShow));
+			} else {
+				menuItem.registerEntityModifier(new MoveXModifier(duration, menuItem.getX(), initialY));
+			}
 			initialY -= menuItem.getHeight() + mDistanceItem;
 		}
 
@@ -161,22 +288,44 @@ public abstract class ExpandableMenu extends BaseMenu {
 			menuItem.clearEntityModifiers();
 			float distance = initialY - menuItem.getY();
 			float duration = distance / 480 * DURATIONX_PER_SCREENSIZE;
-			menuItem.registerEntityModifier(new MoveYModifier(duration, menuItem.getY(), initialY));
-			menuItem.registerEntityModifier(new ParallelEntityModifier(new MoveXModifier(distance / 480
-					* DURATIONX_PER_SCREENSIZE, menuItem.getX(), initialY), new LoopEntityModifier(
-					new RotationByModifier(duration / (distance / 480 * DURATION_ROTATION_COUNT_PER_SCREENSIZE), 360),
-					(int) (distance / 800 * DURATION_ROTATION_COUNT_PER_SCREENSIZE), new IEntityModifierListener() {
+			if (mMenuItemModifierWhenShow != null) {
+				menuItem.registerEntityModifier(new ParallelEntityModifier(new MoveXModifier(duration, menuItem.getY(),
+						initialY, new IEntityModifierListener() {
 
-						@Override
-						public void onModifierStarted(IModifier<IEntity> pModifier, IEntity pItem) {
+							@Override
+							public void onModifierStarted(IModifier<IEntity> pModifier, IEntity pItem) {
 
-						}
+							}
 
-						@Override
-						public void onModifierFinished(IModifier<IEntity> pModifier, IEntity pItem) {
-							((MenuItem) pItem).onNormalState();
-						}
-					})));
+							@Override
+							public void onModifierFinished(IModifier<IEntity> pModifier, IEntity pItem) {
+								if (pItem.getRotation() != 0) {
+									pItem.registerEntityModifier(new RotationModifier(0.2f, pItem.getRotation(), 0,
+											new IEntityModifierListener() {
+
+												@Override
+												public void onModifierStarted(IModifier<IEntity> pModifier,
+														IEntity pItem) {
+
+												}
+
+												@Override
+												public void onModifierFinished(IModifier<IEntity> pModifier,
+														IEntity pItem) {
+													((MenuItem) pItem).setState(State.NOACTION);
+													((MenuItem) pItem).onNormalState();
+												}
+											}));
+								} else {
+									((MenuItem) pItem).setState(State.NOACTION);
+									((MenuItem) pItem).onNormalState();
+								}
+
+							}
+						}), mMenuItemModifierWhenShow));
+			} else {
+				menuItem.registerEntityModifier(new MoveXModifier(duration, menuItem.getX(), initialY));
+			}
 			initialY += menuItem.getHeight() + mDistanceItem;
 		}
 	}
