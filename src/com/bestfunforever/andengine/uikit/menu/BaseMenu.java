@@ -34,15 +34,18 @@ public abstract class BaseMenu extends BaseHUD implements IOnSceneTouchListener 
 	}
 	
 	public BaseMenu(SimpleBaseGameActivity context, Camera mCamera, float ratio) {
+		this.setCamera(mCamera);
 		this.context = context;
 		this.camera_height = mCamera.getHeight();
 		this.camera_width = mCamera.getWidth();
 		this.stage = STAGE.HIDE;
 		this.ratio = ratio;
+	}
+
+	public void init() {
 		this.setOnSceneTouchListener(this);
 		this.setTouchAreaBindingOnActionDownEnabled(true);
 		this.setTouchAreaBindingOnActionMoveEnabled(true);
-		this.setCamera(mCamera);
 		onLoadResource();
 		onCreate();
 	}

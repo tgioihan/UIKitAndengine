@@ -27,6 +27,11 @@ public class BubbleSprite extends BaseSprite {
 		this(pX, pY, pTextureRegion.getWidth()*ratio, pTextureRegion.getHeight()*ratio, text, font, pTextureRegion,
 				pVertexBufferObjectManager);
 	}
+	
+	public BubbleSprite(float pX, float pY, float width, float height, 
+			ITextureRegion pTextureRegion, VertexBufferObjectManager pVertexBufferObjectManager) {
+		this(pX, pY, width, height,null,null, pTextureRegion, pVertexBufferObjectManager);
+	}
 
 	public BubbleSprite(float pX, float pY, float width, float height, String text, Font font,
 			ITextureRegion pTextureRegion, VertexBufferObjectManager pVertexBufferObjectManager) {
