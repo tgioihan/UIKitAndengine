@@ -5,6 +5,7 @@ import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.adt.list.SmartList;
+import org.andengine.util.color.Color;
 
 import android.database.DataSetObserver;
 import android.os.Handler;
@@ -38,6 +39,7 @@ public class ListView extends ClipingRectangle {
 	public ListView(SimpleBaseGameActivity Context, float pX, float pY, float pWidth, float pHeight,
 			VertexBufferObjectManager pVertexBufferObjectManager) {
 		super(pX, pY, pWidth, pHeight, pVertexBufferObjectManager);
+		setColor(Color.TRANSPARENT);
 		this.mContext = Context;
 		mRecycler = new Recycler();
 		mFillinger = new Fillinger();
@@ -131,6 +133,7 @@ public class ListView extends ClipingRectangle {
 		}
 		mView = obtainView(position);
 		mView.setY(top);
+		Log.d(TAG, TAG+" makeAndAddView "+top);
 		mChilds.add(positionToAdd, mView);
 		attachChild(mView);
 		return mView;
@@ -309,11 +312,11 @@ public class ListView extends ClipingRectangle {
 	private void fillGap(boolean down) {
 		final int childCOunt = mChilds.size();
 		if (down) {
-			final float startOffset = childCOunt > 0 ? mChilds.get(0).getY() : (getHeight());
+			final float startOffset = childCOunt > 0 ? mChilds.get(0).getY() : 0;
 			fillUp(mFirstPosition - 1, startOffset);
 		} else {
 			final float startOffset = childCOunt > 0 ? (mChilds.get(childCOunt - 1).getHeight() + mChilds.get(
-					childCOunt - 1).getY()) : 0;
+					childCOunt - 1).getY()) : (getHeight());
 			fillDown(mFirstPosition + childCOunt, startOffset);
 		}
 	}
