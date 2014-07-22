@@ -2,11 +2,14 @@ package com.bestfunforever.andengine.uikit.menu;
 
 import java.util.ArrayList;
 
+import org.andengine.engine.camera.Camera;
 import org.andengine.engine.camera.hud.HUD;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.shape.IAreaShape;
 import org.andengine.input.touch.TouchEvent;
+import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
+import org.andengine.ui.activity.SimpleBaseGameActivity;
 
 import com.bestfunforever.andengine.uikit.entity.IClick;
 
@@ -15,6 +18,12 @@ public abstract class BaseMenu extends BaseHUD implements IOnSceneTouchListener 
 	protected ArrayList<IMenuItem> mMenuItems = new ArrayList<IMenuItem>();
 	protected IMenuItem mSelectedMenuItem;
 	protected IOnMenuItemClickListener mOnMenuItemClickListener;
+	protected ArrayList<BitmapTextureAtlas> atlas = new ArrayList<BitmapTextureAtlas>();
+	
+	protected SimpleBaseGameActivity context;
+	protected float camera_height;
+	protected float camera_width;
+	protected float ratio;
 
 	public IOnMenuItemClickListener getOnMenuItemClickListener() {
 		return mOnMenuItemClickListener;
@@ -22,6 +31,20 @@ public abstract class BaseMenu extends BaseHUD implements IOnSceneTouchListener 
 
 	public void setOnMenuItemClickListener(IOnMenuItemClickListener mOnMenuItemClickListener) {
 		this.mOnMenuItemClickListener = mOnMenuItemClickListener;
+	}
+	
+	public BaseMenu(SimpleBaseGameActivity context, Camera mCamera, float ratio) {
+		this.context = context;
+		this.camera_height = mCamera.getHeight();
+		this.camera_width = mCamera.getWidth();
+		this.stage = STAGE.HIDE;
+		this.ratio = ratio;
+		this.setOnSceneTouchListener(this);
+		this.setTouchAreaBindingOnActionDownEnabled(true);
+		this.setTouchAreaBindingOnActionMoveEnabled(true);
+		this.setCamera(mCamera);
+		onLoadResource();
+		onCreate();
 	}
 
 	public void addMenuItem(MenuItem menuItem) {
@@ -55,6 +78,14 @@ public abstract class BaseMenu extends BaseHUD implements IOnSceneTouchListener 
 		}
 
 		invalidate();
+	}
+
+	@Override
+	public void onDestroy() {
+		for (BitmapTextureAtlas atla : atlas) {
+			atla.unload();
+		}
+		atlas.clear();
 	}
 
 	public abstract void invalidate();

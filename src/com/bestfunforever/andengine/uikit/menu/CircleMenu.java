@@ -1,7 +1,5 @@
 package com.bestfunforever.andengine.uikit.menu;
 
-import java.util.ArrayList;
-
 import org.andengine.engine.camera.Camera;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.modifier.IEntityModifier.IEntityModifierListener;
@@ -9,7 +7,6 @@ import org.andengine.entity.modifier.MoveModifier;
 import org.andengine.entity.modifier.RotationAtModifier;
 import org.andengine.entity.modifier.RotationModifier;
 import org.andengine.entity.sprite.Sprite;
-import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.modifier.IModifier;
@@ -18,29 +15,12 @@ import com.bestfunforever.andengine.uikit.entity.BubbleSprite;
 
 public abstract class CircleMenu extends BaseMenu {
 
-	protected SimpleBaseGameActivity context;
-	protected float camera_height;
-	protected float camera_width;
-	protected float ratio;
-
-	protected ArrayList<BitmapTextureAtlas> atlas = new ArrayList<BitmapTextureAtlas>();
 	protected BubbleSprite controlBgSprite;
 	protected Sprite derectionMenuSprite;
 	protected Sprite holderBgSprite;
 
 	public CircleMenu(SimpleBaseGameActivity context, Camera mCamera, float ratio) {
-		super();
-		this.context = context;
-		this.camera_height = mCamera.getHeight();
-		this.camera_width = mCamera.getWidth();
-		this.stage = STAGE.HIDE;
-		this.ratio = ratio;
-		this.setOnSceneTouchListener(this);
-		this.setTouchAreaBindingOnActionDownEnabled(true);
-		this.setTouchAreaBindingOnActionMoveEnabled(true);
-		this.setCamera(mCamera);
-		onLoadResource();
-		onCreate();
+		super(context,mCamera,ratio);
 	}
 
 	public static void clearITextureRegion(final ITextureRegion mITextureRegion) {
@@ -97,14 +77,6 @@ public abstract class CircleMenu extends BaseMenu {
 				menuListenner.onHide();
 			}
 		}
-	}
-
-	@Override
-	public void onDestroy() {
-		for (BitmapTextureAtlas atla : atlas) {
-			atla.unload();
-		}
-		atlas.clear();
 	}
 
 	private float padding = 60;
