@@ -30,7 +30,7 @@ public abstract class ExpandableMenu extends BaseMenu {
 	/**
 	 * ratio by 480 * 800
 	 */
-	private float DURATIONX_PER_SCREENSIZE = 2;
+	private float DURATIONX_PER_SCREENSIZE = 1;
 
 	public float getDistanceItem() {
 		return mDistanceItem;

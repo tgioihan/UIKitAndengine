@@ -30,7 +30,7 @@ public abstract class AdmobGameActivity extends BaseFacebookAcivity {
 		final FrameLayout frameLayout = new FrameLayout(this);
 		final FrameLayout.LayoutParams frameLayoutLayoutParams = new FrameLayout.LayoutParams(
 				FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT, Gravity.FILL);
-		final FrameLayout.LayoutParams adViewLayoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
+		final FrameLayout.LayoutParams adViewLayoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
 				FrameLayout.LayoutParams.WRAP_CONTENT, positionView);
 
 		adView = new AdView(this);

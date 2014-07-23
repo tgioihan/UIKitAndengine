@@ -5,6 +5,7 @@ import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.adt.list.SmartList;
+import org.andengine.util.color.Color;
 
 import android.database.DataSetObserver;
 import android.os.Handler;
@@ -20,7 +21,7 @@ public class HorizontalListView extends ClipingRectangle {
 	private static final String TAG = "ListView";
 
 	Recycler mRecycler;
-	BaseAdapter mAdapter;
+	protected BaseAdapter mAdapter;
 	DataSetObserver mDataSetObserver;
 	SimpleBaseGameActivity mContext;
 
@@ -38,6 +39,7 @@ public class HorizontalListView extends ClipingRectangle {
 	public HorizontalListView(SimpleBaseGameActivity Context, float pX, float pY, float pWidth, float pHeight,
 			VertexBufferObjectManager pVertexBufferObjectManager) {
 		super(pX, pY, pWidth, pHeight, pVertexBufferObjectManager);
+		setColor(Color.TRANSPARENT);
 		this.mContext = Context;
 		mRecycler = new Recycler();
 		mFillinger = new Fillinger();
@@ -239,7 +241,7 @@ public class HorizontalListView extends ClipingRectangle {
 	/**
 	 * @param diffX
 	 */
-	private void scrollByX(float diffX) {
+	public void scrollByX(float diffX) {
 		final int childCount = mChilds.size();
 		if (childCount == 0) {
 			return;
