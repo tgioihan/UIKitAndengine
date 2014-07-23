@@ -7,6 +7,8 @@ import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
+import com.bestfunforever.andengine.uikit.entity.BaseSprite.State;
+
 import android.util.Log;
 
 public abstract class BaseAnimateSprite extends AnimatedSprite implements ISelector {
@@ -16,12 +18,46 @@ public abstract class BaseAnimateSprite extends AnimatedSprite implements ISelec
 		super(pX, pY, pWidth, pHeight, pTiledTextureRegion, pVertexBufferObjectManager);
 	}
 
+	public enum State {
+		NORMAL, PRESS, SELECTED, NOACTION
+	}
+
+	protected State mState = State.NOACTION;
+
+	public State getState() {
+		return mState;
+	}
+
+	public void setState(State mState) {
+		if (mState != this.mState) {
+			this.mState = mState;
+			switch (this.mState) {
+			case NORMAL:
+				onNormalState();
+				break;
+			case PRESS:
+				onPressState();
+				break;
+			case SELECTED:
+				onSelectedState();
+				break;
+			case NOACTION:
+
+				break;
+
+			default:
+				break;
+			}
+		}
+	}
+
 	private IClick mClickListenner;
 
 	public static final float MINACTIONMOVE = 20;
 	protected float startX, startY;
 	protected float distanceX, distanceY;
 	private boolean isEnabled = true;
+
 	public boolean isEnabled() {
 		return isEnabled;
 	}
@@ -31,7 +67,7 @@ public abstract class BaseAnimateSprite extends AnimatedSprite implements ISelec
 	}
 
 	private boolean isdown = false;
-	
+
 	private float[] touchChecker = new float[2];
 
 	@Override
@@ -40,7 +76,8 @@ public abstract class BaseAnimateSprite extends AnimatedSprite implements ISelec
 			return true;
 		}
 		final int action = pSceneTouchEvent.getAction();
-		Log.d("", "onAreaTouched x "+pSceneTouchEvent.getX()+" y "+pSceneTouchEvent.getY()+"  lcX "+pTouchAreaLocalX+" lcY "+pTouchAreaLocalY);
+		Log.d("", "onAreaTouched x " + pSceneTouchEvent.getX() + " y " + pSceneTouchEvent.getY() + "  lcX "
+				+ pTouchAreaLocalX + " lcY " + pTouchAreaLocalY);
 		switch (action) {
 		case TouchEvent.ACTION_DOWN:
 			isdown = true;
@@ -91,23 +128,22 @@ public abstract class BaseAnimateSprite extends AnimatedSprite implements ISelec
 	}
 
 	private boolean checkActionOutSide(float[] touchChecker) {
-		if (touchChecker[0] < 0 || touchChecker[0] > getWidth() || touchChecker[1] < 0
-				|| touchChecker[1] > getHeight()){
+		if (touchChecker[0] < 0 || touchChecker[0] > getWidth() || touchChecker[1] < 0 || touchChecker[1] > getHeight()) {
 			Log.d("", "checkActionOutSide ouside");
 			return false;
 		}
 		Log.d("", "checkActionOutSide inside");
-			return true;
+		return true;
 	}
 
 	private boolean checkActionOutSide(float pTouchAreaLocalX, float pTouchAreaLocalY) {
 		if (pTouchAreaLocalX < 0 || pTouchAreaLocalX > getWidth() || pTouchAreaLocalY < 0
-				|| pTouchAreaLocalY > getHeight()){
+				|| pTouchAreaLocalY > getHeight()) {
 			Log.d("", "checkActionOutSide ouside");
 			return false;
 		}
 		Log.d("", "checkActionOutSide inside");
-			return true;
+		return true;
 	}
 
 	public IClick getClickListenner() {
@@ -117,6 +153,5 @@ public abstract class BaseAnimateSprite extends AnimatedSprite implements ISelec
 	public void setClickListenner(IClick mClickListenner) {
 		this.mClickListenner = mClickListenner;
 	}
-	
 
 }

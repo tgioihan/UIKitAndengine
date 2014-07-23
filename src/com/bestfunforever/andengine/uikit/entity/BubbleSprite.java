@@ -90,6 +90,7 @@ public class BubbleSprite extends BaseSprite {
 
 	@Override
 	public void onNormalState() {
+		Log.d("", "BubbleSprite mState "+mState);
 		if (mState != State.NORMAL) {
 			mState = State.NORMAL;
 			clearEntityModifiers();

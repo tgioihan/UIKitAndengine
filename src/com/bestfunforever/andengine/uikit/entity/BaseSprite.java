@@ -25,7 +25,28 @@ public abstract class BaseSprite extends Sprite implements ISelector {
 	}
 
 	public void setState(State mState) {
-		this.mState = mState;
+		Log.d("", "BubbleSprite setState mState "+mState);
+		if (mState != this.mState) {
+			
+			switch (mState) {
+			case NORMAL:
+				onNormalState();
+				break;
+			case PRESS:
+				onPressState();
+				break;
+			case SELECTED:
+				onSelectedState();
+				break;
+			case NOACTION:
+
+				break;
+
+			default:
+				break;
+			}
+			this.mState = mState;
+		}
 	}
 
 	private IClick mClickListenner;
