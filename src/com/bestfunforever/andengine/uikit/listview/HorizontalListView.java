@@ -159,8 +159,37 @@ public class HorizontalListView extends ClipingRectangle {
 
 	public static final int INVALID_POSTION = -1;
 
+	/**
+	 * if not , no more action happen
+	 */
+	private boolean enable = true;
+	/**
+	 * if not , no move action happen
+	 */
+	private boolean moveEnable = true;
+
+	public boolean isEnable() {
+		return enable;
+	}
+
+	public void setEnable(boolean enable) {
+		this.enable = enable;
+	}
+
+	public boolean isMoveEnable() {
+		return moveEnable;
+	}
+
+	public void setMoveEnable(boolean moveEnable) {
+		this.moveEnable = moveEnable;
+	}
+
 	@Override
 	public boolean onAreaTouched(TouchEvent event, float pTouchAreaLocalX, float pTouchAreaLocalY) {
+		if(!enable){
+			return false;
+		}
+		
 		if (velocityTracker == null) { // If we do not have velocity tracker
 			velocityTracker = VelocityTracker.obtain(); // then get one
 		}
@@ -176,6 +205,7 @@ public class HorizontalListView extends ClipingRectangle {
 			break;
 
 		case TouchEvent.ACTION_MOVE:
+			
 			final float diffX = event.getX() - currentX;
 			final float totalDiff = event.getX() - initialX;
 			currentX = event.getX();
@@ -184,24 +214,28 @@ public class HorizontalListView extends ClipingRectangle {
 					scrollFlag = true;
 				}
 			} else {
-				mContext.runOnUpdateThread(new Runnable() {
+				if(moveEnable){
+					mContext.runOnUpdateThread(new Runnable() {
 
-					@Override
-					public void run() {
-						scrollByX(diffX);
-					}
-				});
+						@Override
+						public void run() {
+							scrollByX(diffX);
+						}
+					});
+				}
 			}
 
 			break;
 
 		case TouchEvent.ACTION_UP:
 			if (scrollFlag) {
-				velocityTracker.computeCurrentVelocity(1000);
-				int initialVelocity = (int) velocityTracker.getXVelocity();
-				if (Math.abs(initialVelocity) > 0) {
-					// start filling
-					mFillinger.fling((int) event.getX(), 0, -initialVelocity);
+				if(moveEnable){
+					velocityTracker.computeCurrentVelocity(1000);
+					int initialVelocity = (int) velocityTracker.getXVelocity();
+					if (Math.abs(initialVelocity) > 0) {
+						// start filling
+						mFillinger.fling((int) event.getX(), 0, -initialVelocity);
+					}
 				}
 			} else {
 				if (onItemClickListenner != null) {

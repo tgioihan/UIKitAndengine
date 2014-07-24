@@ -30,7 +30,7 @@ public abstract class ExpandableMenu extends BaseMenu {
 	/**
 	 * ratio by 480 * 800
 	 */
-	private float DURATIONX_PER_SCREENSIZE = 1;
+	private float DURATIONX_PER_SCREENSIZE = 0.7f;
 
 	public float getDistanceItem() {
 		return mDistanceItem;
@@ -164,7 +164,7 @@ public abstract class ExpandableMenu extends BaseMenu {
 						((MenuItem) pItem).unregisterEntityModifier((IEntityModifier) pModifier);
 						((MenuItem) pItem).setVisible(true);
 						((MenuItem) pItem).setEnabled(true);
-//						((MenuItem) pItem).setState(State.NOACTION);
+						// ((MenuItem) pItem).setState(State.NOACTION);
 						((MenuItem) pItem).setState(State.NORMAL);
 						if (checkState)
 							stage = STAGE.SHOW;
