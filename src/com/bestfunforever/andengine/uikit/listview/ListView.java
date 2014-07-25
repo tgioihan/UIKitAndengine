@@ -27,6 +27,10 @@ public class ListView extends ClipingRectangle {
 
 	SmartList<IAreaShape> mChilds = new SmartList<IAreaShape>();
 
+	public SmartList<IAreaShape> getChildrents() {
+		return mChilds;
+	}
+
 	int mSelection;
 	int mFirstPosition;
 
@@ -111,7 +115,7 @@ public class ListView extends ClipingRectangle {
 			detachChild(entity);
 		}
 		mChilds.clear();
-		
+
 		// init view for first view ( could be selection)
 		makeAndAddView(mFirstPosition, top, 0);
 		fillGap(true);
@@ -133,7 +137,7 @@ public class ListView extends ClipingRectangle {
 		}
 		mView = obtainView(position);
 		mView.setY(top);
-		Log.d(TAG, TAG+" makeAndAddView "+top);
+		Log.d(TAG, TAG + " makeAndAddView " + top);
 		mChilds.add(positionToAdd, mView);
 		attachChild(mView);
 		return mView;
@@ -218,12 +222,12 @@ public class ListView extends ClipingRectangle {
 
 			}
 
-//			velocityTracker.recycle();
+			// velocityTracker.recycle();
 			break;
 		case TouchEvent.ACTION_CANCEL:
 			velocityTracker.recycle();
 			break;
-			
+
 		default:
 			break;
 		}
@@ -351,7 +355,7 @@ public class ListView extends ClipingRectangle {
 	}
 
 	public void setSelectionFromTop(int selection, float diffTop, boolean scroll) {
-		if(mAdapter == null){
+		if (mAdapter == null) {
 			mFirstPosition = mSelection = selection;
 			this.mDiffTopForSelection = diffTop;
 			return;
@@ -373,7 +377,7 @@ public class ListView extends ClipingRectangle {
 		if (mAdapter != null && mAdapter.getCount() > 0 && mChilds.size() > 0) {
 			int diffPos = mSelection - mFirstPosition;
 			final float diffY = diffPos * mAdapter.getChildHeight() - diffTop;
-			if (scroll&&(mFirstPosition<mSelection&& diffPos<maxItemVisible)) {
+			if (scroll && (mFirstPosition < mSelection && diffPos < maxItemVisible)) {
 				mFillinger.scroll(0, (int) mChilds.get(0).getY(), 0, (int) diffY);
 			} else {
 				selectionFlag = true;

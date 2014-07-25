@@ -26,6 +26,10 @@ public class HorizontalListView extends ClipingRectangle {
 	SimpleBaseGameActivity mContext;
 
 	SmartList<IAreaShape> mChilds = new SmartList<IAreaShape>();
+	
+	public SmartList<IAreaShape> getChildrents(){
+		return mChilds;
+	}
 
 	int mSelection;
 	int mFirstPosition;
