@@ -4,9 +4,9 @@ import org.andengine.entity.primitive.Rectangle;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.color.Color;
 
-public class ProgessBarColor extends Rectangle {
+public class ProgessBarColor extends Rectangle implements IProgress {
 
-	private float percent;
+	private int percent;
 	private float borderWidth;
 	private Rectangle progess;
 
@@ -18,7 +18,7 @@ public class ProgessBarColor extends Rectangle {
 	}
 
 	public ProgessBarColor(float pX, float pY, float pWidth, float pHeight,
-			float percent, Color borderColor, float borderWidth,
+			int percent, Color borderColor, float borderWidth,
 			Color progessColor, Color bgColor,
 			VertexBufferObjectManager pVertexBufferObjectManager) {
 		super(pX, pY, pWidth, pHeight, pVertexBufferObjectManager);
@@ -26,8 +26,8 @@ public class ProgessBarColor extends Rectangle {
 		this.borderWidth = borderWidth;
 		this.percent = percent;
 		progess = new Rectangle(borderWidth, borderWidth,
-				(pWidth - borderWidth * 2) * percent/100,
-				pHeight - 2 * borderWidth, pVertexBufferObjectManager);
+				(pWidth - borderWidth * 2) * percent / 100, pHeight - 2
+						* borderWidth, pVertexBufferObjectManager);
 		Rectangle bgRectangle = new Rectangle(borderWidth, borderWidth, pWidth
 				- borderWidth * 2, pHeight - 2 * borderWidth,
 				pVertexBufferObjectManager);
@@ -40,7 +40,7 @@ public class ProgessBarColor extends Rectangle {
 	/**
 	 * @return the percent
 	 */
-	public float getPercent() {
+	public int getPercent() {
 		return percent;
 	}
 
@@ -48,9 +48,9 @@ public class ProgessBarColor extends Rectangle {
 	 * @param percent
 	 *            the percent to set
 	 */
-	public void setPercent(float percent) {
+	public void setPercent(int percent) {
 		this.percent = percent;
-		progess.setWidth((getWidth() - borderWidth * 2) * percent/100);
+		progess.setWidth((getWidth() - borderWidth * 2) * percent / 100);
 	}
 
 }

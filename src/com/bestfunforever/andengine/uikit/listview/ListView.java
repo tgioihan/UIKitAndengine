@@ -426,7 +426,7 @@ public class ListView extends ClipingRectangle {
 		private static final int defaultDurationPerScreenHeight = 1000;
 
 		public void scroll(int startX, int startY, int dx, int dy) {
-			int duration = dy / 480 * defaultDurationPerScreenHeight;
+			int duration = dy* defaultDurationPerScreenHeight / 480 ;
 			if (duration > defaultDurationPerScreenHeight) {
 				duration = defaultDurationPerScreenHeight;
 			}
