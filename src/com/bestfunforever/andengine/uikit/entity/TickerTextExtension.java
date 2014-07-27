@@ -82,6 +82,7 @@ public class TickerTextExtension extends Text {
 
 	@Override
 	public void setText(CharSequence pText) throws OutOfCharactersException {
+		reset();
 		super.setText(pText);
 
 		if(this.mTickerTextOptions != null) {
