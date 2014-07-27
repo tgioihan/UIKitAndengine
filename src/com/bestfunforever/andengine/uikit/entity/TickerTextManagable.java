@@ -1,11 +1,10 @@
 package com.bestfunforever.andengine.uikit.entity;
 
-import org.andengine.entity.text.TickerText;
 import org.andengine.entity.text.exception.OutOfCharactersException;
 import org.andengine.opengl.font.IFont;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
-public class TickerTextManagable extends TickerText {
+public class TickerTextManagable extends TickerTextExtension {
 
 	private boolean tickComplete = false;
 	private ITickerTextListenner mTickerTextListenner;
@@ -22,6 +21,13 @@ public class TickerTextManagable extends TickerText {
 			TickerTextOptions pTickerTextOptions,
 			VertexBufferObjectManager pVertexBufferObjectManager) {
 		super(pX, pY, pFont, pText, pTickerTextOptions,
+				pVertexBufferObjectManager);
+	}
+
+	public TickerTextManagable(float pX, float pY, IFont pFont, String pText,
+			int maxText, TickerTextOptions pTickerTextOptions,
+			VertexBufferObjectManager pVertexBufferObjectManager) {
+		super(pX, pY, pFont, pText, maxText, pTickerTextOptions,
 				pVertexBufferObjectManager);
 	}
 
