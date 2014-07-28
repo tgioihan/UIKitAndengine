@@ -1,4 +1,4 @@
-package com.bestfunforever.andengine.uikit.entity;
+package com.bestfunforever.andengine.uikit.entity.text;
 
 import org.andengine.entity.text.exception.OutOfCharactersException;
 import org.andengine.opengl.font.IFont;

@@ -11,7 +11,7 @@ import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.modifier.IModifier;
 
-import com.bestfunforever.andengine.uikit.entity.BubbleSprite;
+import com.bestfunforever.andengine.uikit.entity.Sprite.BubbleSprite;
 
 public abstract class CircleMenu extends BaseMenu {
 

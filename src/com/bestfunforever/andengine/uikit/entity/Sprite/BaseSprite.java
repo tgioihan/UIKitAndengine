@@ -1,21 +1,34 @@
-package com.bestfunforever.andengine.uikit.entity;
+package com.bestfunforever.andengine.uikit.entity.Sprite;
 
-import org.andengine.entity.sprite.AnimatedSprite;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.region.ITextureRegion;
-import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
-import com.bestfunforever.andengine.uikit.entity.BaseSprite.State;
+import com.bestfunforever.andengine.uikit.entity.IClick;
+import com.bestfunforever.andengine.uikit.entity.ISelector;
 
 import android.util.Log;
 
-public abstract class BaseAnimateSprite extends AnimatedSprite implements ISelector {
+public abstract class BaseSprite extends Sprite implements ISelector {
 
-	public BaseAnimateSprite(float pX, float pY, float pWidth, float pHeight, ITiledTextureRegion pTiledTextureRegion,
+	public BaseSprite(float pX, float pY, float pWidth, float pHeight, ITextureRegion pTextureRegion,
 			VertexBufferObjectManager pVertexBufferObjectManager) {
-		super(pX, pY, pWidth, pHeight, pTiledTextureRegion, pVertexBufferObjectManager);
+		super(pX, pY, pWidth, pHeight, pTextureRegion, pVertexBufferObjectManager);
+	}
+
+	public int ID = 0;
+
+	@Override
+	public int getId() {
+		// TODO Auto-generated method stub
+		return ID;
+	}
+
+	@Override
+	public void setId(int id) {
+		// TODO Auto-generated method stub
+		this.ID = id;
 	}
 
 	public enum State {
@@ -29,9 +42,10 @@ public abstract class BaseAnimateSprite extends AnimatedSprite implements ISelec
 	}
 
 	public void setState(State mState) {
+		Log.d("", "BubbleSprite setState mState " + mState);
 		if (mState != this.mState) {
-			this.mState = mState;
-			switch (this.mState) {
+
+			switch (mState) {
 			case NORMAL:
 				onNormalState();
 				break;
@@ -48,6 +62,7 @@ public abstract class BaseAnimateSprite extends AnimatedSprite implements ISelec
 			default:
 				break;
 			}
+			this.mState = mState;
 		}
 	}
 
@@ -129,16 +144,6 @@ public abstract class BaseAnimateSprite extends AnimatedSprite implements ISelec
 
 	private boolean checkActionOutSide(float[] touchChecker) {
 		if (touchChecker[0] < 0 || touchChecker[0] > getWidth() || touchChecker[1] < 0 || touchChecker[1] > getHeight()) {
-			Log.d("", "checkActionOutSide ouside");
-			return false;
-		}
-		Log.d("", "checkActionOutSide inside");
-		return true;
-	}
-
-	private boolean checkActionOutSide(float pTouchAreaLocalX, float pTouchAreaLocalY) {
-		if (pTouchAreaLocalX < 0 || pTouchAreaLocalX > getWidth() || pTouchAreaLocalY < 0
-				|| pTouchAreaLocalY > getHeight()) {
 			Log.d("", "checkActionOutSide ouside");
 			return false;
 		}

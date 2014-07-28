@@ -4,7 +4,7 @@ import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
-import com.bestfunforever.andengine.uikit.entity.BubbleSprite;
+import com.bestfunforever.andengine.uikit.entity.Sprite.BubbleSprite;
 
 public class MenuItem extends BubbleSprite implements IMenuItem{
 	private int ID;

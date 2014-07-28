@@ -18,8 +18,8 @@ import org.andengine.util.modifier.IModifier.IModifierListener;
 
 import android.util.Log;
 
-import com.bestfunforever.andengine.uikit.entity.BubbleSprite;
 import com.bestfunforever.andengine.uikit.entity.IClick;
+import com.bestfunforever.andengine.uikit.entity.Sprite.BubbleSprite;
 
 public abstract class Dialog extends HUD {
 

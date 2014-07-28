@@ -14,7 +14,7 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.widget.Scroller;
 
-import com.bestfunforever.andengine.uikit.entity.ClipingRectangle;
+import com.bestfunforever.andengine.uikit.entity.Sprite.ClipingRectangle;
 
 public class HorizontalListView extends ClipingRectangle {
 

@@ -1,4 +1,4 @@
-package com.bestfunforever.andengine.uikit.entity;
+package com.bestfunforever.andengine.uikit.entity.Sprite;
 
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.sprite.Sprite;
@@ -6,6 +6,8 @@ import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.color.Color;
+
+import com.bestfunforever.andengine.uikit.entity.IProgress;
 
 import android.os.Handler;
 import android.util.Log;
@@ -65,8 +67,8 @@ public class SeekBar extends Rectangle implements IProgress {
 		progess = new Rectangle(borderWidth, borderWidth, progressWidth,
 				pHeight - 2 * borderWidth, pVertexBufferObjectManager);
 		progess.setColor(progessColor);
-		thumbSprite = new Sprite(borderWidth + progressWidth - thumb.getWidth()
-				/ 2, getHeight() / 2 - thumb.getHeight() / 2, thumb.getWidth()
+		thumbSprite = new Sprite(borderWidth + progressWidth - thumb.getWidth()* ratio
+				/ 2, getHeight() / 2 - thumb.getHeight()* ratio / 2, thumb.getWidth()
 				* ratio, thumb.getHeight() * ratio, thumb,
 				pVertexBufferObjectManager);
 		attachChild(progess);

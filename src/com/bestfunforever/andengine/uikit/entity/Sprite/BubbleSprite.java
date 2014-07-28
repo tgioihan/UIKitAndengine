@@ -1,4 +1,4 @@
-package com.bestfunforever.andengine.uikit.entity;
+package com.bestfunforever.andengine.uikit.entity.Sprite;
 
 import org.andengine.entity.modifier.LoopEntityModifier;
 import org.andengine.entity.modifier.ScaleModifier;
@@ -7,30 +7,34 @@ import org.andengine.entity.text.AutoWrap;
 import org.andengine.entity.text.Text;
 import org.andengine.entity.text.TextOptions;
 import org.andengine.opengl.font.Font;
-import org.andengine.opengl.texture.region.ITiledTextureRegion;
+import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.HorizontalAlign;
 
 import android.util.Log;
 
-import com.bestfunforever.andengine.uikit.entity.BaseAnimateSprite;
+import com.bestfunforever.andengine.uikit.entity.Sprite.BaseSprite;
 
-public class BubbleAnimateSprite extends BaseAnimateSprite {
-	
-	public BubbleAnimateSprite(float pX, float pY, String text, Font font, ITiledTextureRegion pTextureRegion,
+public class BubbleSprite extends BaseSprite {
+	public BubbleSprite(float pX, float pY, String text, Font font, ITextureRegion pTextureRegion,
 			VertexBufferObjectManager pVertexBufferObjectManager) {
-		this(pX, pY, 1, text, font, pTextureRegion,
+		this(pX, pY, pTextureRegion.getWidth(), pTextureRegion.getHeight(), text, font, pTextureRegion,
 				pVertexBufferObjectManager);
 	}
 	
-	public BubbleAnimateSprite(float pX, float pY,float ratio, String text, Font font, ITiledTextureRegion pTextureRegion,
+	public BubbleSprite(float pX, float pY,float ratio, String text, Font font, ITextureRegion pTextureRegion,
 			VertexBufferObjectManager pVertexBufferObjectManager) {
 		this(pX, pY, pTextureRegion.getWidth()*ratio, pTextureRegion.getHeight()*ratio, text, font, pTextureRegion,
 				pVertexBufferObjectManager);
 	}
+	
+	public BubbleSprite(float pX, float pY, float width, float height, 
+			ITextureRegion pTextureRegion, VertexBufferObjectManager pVertexBufferObjectManager) {
+		this(pX, pY, width, height,null,null, pTextureRegion, pVertexBufferObjectManager);
+	}
 
-	public BubbleAnimateSprite(float pX, float pY, float width, float height, String text, Font font,
-			ITiledTextureRegion pTextureRegion, VertexBufferObjectManager pVertexBufferObjectManager) {
+	public BubbleSprite(float pX, float pY, float width, float height, String text, Font font,
+			ITextureRegion pTextureRegion, VertexBufferObjectManager pVertexBufferObjectManager) {
 		super(pX, pY, width, height, pTextureRegion, pVertexBufferObjectManager);
 		this.mFont = font;
 		setLabel(text);
@@ -84,14 +88,9 @@ public class BubbleAnimateSprite extends BaseAnimateSprite {
 		
 	}
 
-	public enum State {
-		NORMAL, PRESS, SELECTED,NOACTION
-	}
-
-	private State mState = State.NOACTION;
-
 	@Override
 	public void onNormalState() {
+		Log.d("", "BubbleSprite mState "+mState);
 		if (mState != State.NORMAL) {
 			mState = State.NORMAL;
 			clearEntityModifiers();

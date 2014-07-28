@@ -14,8 +14,8 @@ import org.andengine.util.modifier.IModifier;
 
 import android.util.Log;
 
-import com.bestfunforever.andengine.uikit.entity.BaseSprite.State;
-import com.bestfunforever.andengine.uikit.entity.BubbleSprite;
+import com.bestfunforever.andengine.uikit.entity.Sprite.BubbleSprite;
+import com.bestfunforever.andengine.uikit.entity.Sprite.BaseSprite.State;
 
 public abstract class ExpandableMenu extends BaseMenu {
 

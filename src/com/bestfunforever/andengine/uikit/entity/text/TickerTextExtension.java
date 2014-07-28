@@ -1,10 +1,9 @@
-package com.bestfunforever.andengine.uikit.entity;
+package com.bestfunforever.andengine.uikit.entity.text;
 
 import org.andengine.engine.camera.Camera;
 import org.andengine.entity.text.AutoWrap;
 import org.andengine.entity.text.Text;
 import org.andengine.entity.text.TextOptions;
-import org.andengine.entity.text.TickerText.TickerTextOptions;
 import org.andengine.entity.text.exception.OutOfCharactersException;
 import org.andengine.opengl.font.IFont;
 import org.andengine.opengl.util.GLState;
@@ -13,7 +12,7 @@ import org.andengine.util.HorizontalAlign;
 
 import android.opengl.GLES20;
 
-public class TickerTextExtension extends Text {
+public class TickerTextExtension extends TextExtension {
 	// ===========================================================
 	// Constants
 	// ===========================================================

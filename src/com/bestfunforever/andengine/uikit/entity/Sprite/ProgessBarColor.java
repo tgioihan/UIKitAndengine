@@ -1,8 +1,10 @@
-package com.bestfunforever.andengine.uikit.entity;
+package com.bestfunforever.andengine.uikit.entity.Sprite;
 
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.color.Color;
+
+import com.bestfunforever.andengine.uikit.entity.IProgress;
 
 public class ProgessBarColor extends Rectangle implements IProgress {
 

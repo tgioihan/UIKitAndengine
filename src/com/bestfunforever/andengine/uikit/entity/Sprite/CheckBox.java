@@ -1,4 +1,4 @@
-package com.bestfunforever.andengine.uikit.entity;
+package com.bestfunforever.andengine.uikit.entity.Sprite;
 
 import org.andengine.entity.shape.IAreaShape;
 import org.andengine.opengl.texture.region.ITiledTextureRegion;
