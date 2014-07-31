@@ -50,7 +50,7 @@ public abstract class BaseMenu extends BaseHUD implements IOnSceneTouchListener 
 		onCreate();
 	}
 
-	public void addMenuItem(MenuItem menuItem) {
+	public void addMenuItem(IMenuItem menuItem) {
 		mMenuItems.add(menuItem);
 		menuItem.setClickListenner(new IClick() {
 
@@ -65,9 +65,9 @@ public abstract class BaseMenu extends BaseHUD implements IOnSceneTouchListener 
 		invalidate();
 	}
 
-	public void addMenuItem(ArrayList<MenuItem> menuItems) {
+	public void addMenuItem(ArrayList<IMenuItem> menuItems) {
 		mMenuItems.addAll(menuItems);
-		for (MenuItem iMenuItem : menuItems) {
+		for (IMenuItem iMenuItem : menuItems) {
 			iMenuItem.setClickListenner(new IClick() {
 
 				@Override

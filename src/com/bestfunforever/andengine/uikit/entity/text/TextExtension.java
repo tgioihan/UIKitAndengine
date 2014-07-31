@@ -13,6 +13,7 @@ import android.util.Log;
 
 import com.bestfunforever.andengine.uikit.entity.IClick;
 import com.bestfunforever.andengine.uikit.entity.ISelector;
+import com.bestfunforever.andengine.uikit.entity.State;
 
 public class TextExtension extends Text implements ISelector {
 
@@ -134,11 +135,6 @@ public class TextExtension extends Text implements ISelector {
 		this.ID = id;
 	}
 
-
-	public enum State {
-		NORMAL, PRESS, SELECTED, NOACTION
-	}
-
 	protected State mState = State.NOACTION;
 
 	public State getState() {
@@ -181,7 +177,7 @@ public class TextExtension extends Text implements ISelector {
 		return isEnabled;
 	}
 
-	public void setEnabled(boolean isEnabled) {
+	public void setEnable(boolean isEnabled) {
 		this.isEnabled = isEnabled;
 	}
 

@@ -13,6 +13,8 @@ import org.andengine.util.HorizontalAlign;
 
 import android.util.Log;
 
+import com.bestfunforever.andengine.uikit.entity.State;
+
 public class BubbleAnimateSprite extends BaseAnimateSprite {
 	
 	public BubbleAnimateSprite(float pX, float pY, String text, Font font, ITiledTextureRegion pTextureRegion,
@@ -80,10 +82,6 @@ public class BubbleAnimateSprite extends BaseAnimateSprite {
 		Log.d("", "BubbleSprite onSelectedState");
 		onNormalState();
 		
-	}
-
-	public enum State {
-		NORMAL, PRESS, SELECTED,NOACTION
 	}
 
 	private State mState = State.NOACTION;

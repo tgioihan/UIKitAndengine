@@ -4,6 +4,7 @@ import org.andengine.entity.shape.IAreaShape;
 import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
+import com.bestfunforever.andengine.uikit.entity.ICheckedChange;
 import com.bestfunforever.andengine.uikit.entity.IClick;
 
 public class CheckBox extends BubbleAnimateSprite {
@@ -57,6 +58,10 @@ public class CheckBox extends BubbleAnimateSprite {
 		});
 	}
 
+	public boolean isChecked() {
+		return isChecked;
+	}
+
 	public void setChecked(boolean checked) {
 		if (isChecked != checked) {
 			isChecked = checked;
@@ -73,10 +78,6 @@ public class CheckBox extends BubbleAnimateSprite {
 
 	public void setOnCheckedChangeListenner(ICheckedChange onCheckedChangeListenner) {
 		this.onCheckedChangeListenner = onCheckedChangeListenner;
-	}
-
-	public interface ICheckedChange {
-		public void onCheckedChange(boolean checked);
 	}
 
 }

@@ -14,8 +14,8 @@ import org.andengine.util.modifier.IModifier;
 
 import android.util.Log;
 
+import com.bestfunforever.andengine.uikit.entity.State;
 import com.bestfunforever.andengine.uikit.entity.Sprite.BubbleSprite;
-import com.bestfunforever.andengine.uikit.entity.Sprite.BaseSprite.State;
 
 public abstract class ExpandableMenu extends BaseMenu {
 
@@ -88,7 +88,7 @@ public abstract class ExpandableMenu extends BaseMenu {
 			float totalDisTanceX = mControl.getX();
 			float totalDisTanceY = mControl.getY();
 			for (int i = 0; i < mMenuItems.size(); i++) {
-				MenuItem menuItem = (MenuItem) mMenuItems.get(i);
+				IMenuItem menuItem =  mMenuItems.get(i);
 				if (i != mMenuItems.size() - 1) {
 					totalDisTanceX += menuItem.getWidth() + mDistanceItem;
 					totalDisTanceY += menuItem.getHeight() + mDistanceItem;
@@ -104,20 +104,20 @@ public abstract class ExpandableMenu extends BaseMenu {
 
 			for (int i = 0; i < mMenuItems.size(); i++) {
 				final int position = i;
-				MenuItem menuItem = (MenuItem) mMenuItems.get(i);
+				IMenuItem menuItem =  mMenuItems.get(i);
 				menuItem.registerEntityModifier(new ParallelEntityModifier(new MoveModifier(duration, menuItem.getX(),
 						mControl.getX(), menuItem.getY(), mControl.getY(), new IEntityModifierListener() {
 
 							@Override
 							public void onModifierStarted(IModifier<IEntity> pModifier, IEntity pItem) {
-								((MenuItem) pItem).setEnabled(false);
+								((IMenuItem) pItem).setEnable(false);
 							}
 
 							@Override
 							public void onModifierFinished(IModifier<IEntity> pModifier, IEntity pItem) {
-								((MenuItem) pItem).unregisterEntityModifier((IEntityModifier) pModifier);
-								((MenuItem) pItem).setEnabled(false);
-								((MenuItem) pItem).setVisible(false);
+								((IMenuItem) pItem).unregisterEntityModifier((IEntityModifier) pModifier);
+								((IMenuItem) pItem).setEnable(false);
+								( (IMenuItem)pItem).setVisible(false);
 								if (position == mMenuItems.size() - 1)
 									stage = STAGE.HIDE;
 							}
@@ -131,7 +131,7 @@ public abstract class ExpandableMenu extends BaseMenu {
 		float initialY = mControl.getY();
 		float totalDisTance = initialX;
 		for (int i = 0; i < mMenuItems.size(); i++) {
-			MenuItem menuItem = (MenuItem) mMenuItems.get(i);
+			IMenuItem menuItem = mMenuItems.get(i);
 			if (i != mMenuItems.size() - 1)
 				totalDisTance += menuItem.getWidth() + mDistanceItem;
 		}
@@ -140,32 +140,32 @@ public abstract class ExpandableMenu extends BaseMenu {
 		float duration = distance / 480 * DURATIONX_PER_SCREENSIZE;
 
 		for (int i = 0; i < mMenuItems.size(); i++) {
-			MenuItem menuItem = (MenuItem) mMenuItems.get(i);
+			IMenuItem menuItem =  mMenuItems.get(i);
 			movingItem(i, duration, menuItem, initialX, initialY, i == mMenuItems.size() - 1);
 			initialX += menuItem.getWidth() + mDistanceItem;
 		}
 	}
 
-	private void movingItem(int position, float durationTranslate, MenuItem menuItem, float initialX, float initialY,
+	private void movingItem(int position, float durationTranslate, IMenuItem menuItem, float initialX, float initialY,
 			final boolean checkState) {
 		menuItem.registerEntityModifier(new ParallelEntityModifier(new MoveModifier(durationTranslate, menuItem.getX(),
 				initialX, menuItem.getY(), initialY, new IEntityModifierListener() {
 
 					@Override
 					public void onModifierStarted(IModifier<IEntity> pModifier, IEntity pItem) {
-						((MenuItem) pItem).setVisible(true);
-						((MenuItem) pItem).setEnabled(false);
+						((IMenuItem) pItem).setVisible(true);
+						((IMenuItem) pItem).setEnable(false);
 						if (checkState)
 							stage = STAGE.ANIMATE;
 					}
 
 					@Override
 					public void onModifierFinished(IModifier<IEntity> pModifier, IEntity pItem) {
-						((MenuItem) pItem).unregisterEntityModifier((IEntityModifier) pModifier);
-						((MenuItem) pItem).setVisible(true);
-						((MenuItem) pItem).setEnabled(true);
-						// ((MenuItem) pItem).setState(State.NOACTION);
-						((MenuItem) pItem).setState(State.NORMAL);
+						((IMenuItem) pItem).unregisterEntityModifier((IEntityModifier) pModifier);
+						((IMenuItem) pItem).setVisible(true);
+						((IMenuItem) pItem).setEnable(true);
+						// ( pItem).setState(State.NOACTION);
+						((IMenuItem) pItem).setState(State.NORMAL);
 						if (checkState)
 							stage = STAGE.SHOW;
 
@@ -180,7 +180,7 @@ public abstract class ExpandableMenu extends BaseMenu {
 
 		float totalDisTance = initialX;
 		for (int i = 0; i < mMenuItems.size(); i++) {
-			MenuItem menuItem = (MenuItem) mMenuItems.get(i);
+			IMenuItem menuItem =  mMenuItems.get(i);
 			if (i != mMenuItems.size() - 1)
 				totalDisTance -= menuItem.getWidth() + mDistanceItem;
 		}
@@ -188,7 +188,7 @@ public abstract class ExpandableMenu extends BaseMenu {
 		float duration = distance / 480 * DURATIONX_PER_SCREENSIZE;
 
 		for (int i = 0; i < mMenuItems.size(); i++) {
-			MenuItem menuItem = (MenuItem) mMenuItems.get(i);
+			IMenuItem menuItem =  mMenuItems.get(i);
 			movingItem(i, duration, menuItem, initialX, initialY, i == mMenuItems.size() - 1);
 			initialX -= menuItem.getWidth() + mDistanceItem;
 		}
@@ -200,7 +200,7 @@ public abstract class ExpandableMenu extends BaseMenu {
 
 		float totalDisTance = initialY;
 		for (int i = 0; i < mMenuItems.size(); i++) {
-			MenuItem menuItem = (MenuItem) mMenuItems.get(i);
+			IMenuItem menuItem =  mMenuItems.get(i);
 			if (i != mMenuItems.size() - 1)
 				totalDisTance -= menuItem.getHeight() + mDistanceItem;
 		}
@@ -208,7 +208,7 @@ public abstract class ExpandableMenu extends BaseMenu {
 		float duration = distance / 480 * DURATIONX_PER_SCREENSIZE;
 
 		for (int i = 0; i < mMenuItems.size(); i++) {
-			MenuItem menuItem = (MenuItem) mMenuItems.get(i);
+			IMenuItem menuItem =  mMenuItems.get(i);
 			movingItem(i, duration, menuItem, initialX, initialY, i == mMenuItems.size() - 1);
 			initialY -= menuItem.getHeight() + mDistanceItem;
 		}
@@ -221,7 +221,7 @@ public abstract class ExpandableMenu extends BaseMenu {
 
 		float totalDisTance = initialY;
 		for (int i = 0; i < mMenuItems.size(); i++) {
-			MenuItem menuItem = (MenuItem) mMenuItems.get(i);
+			IMenuItem menuItem =  mMenuItems.get(i);
 			if (i != mMenuItems.size() - 1)
 				totalDisTance += menuItem.getHeight() + mDistanceItem;
 		}
@@ -229,7 +229,7 @@ public abstract class ExpandableMenu extends BaseMenu {
 		float duration = distance / 480 * DURATIONX_PER_SCREENSIZE;
 
 		for (int i = 0; i < mMenuItems.size(); i++) {
-			MenuItem menuItem = (MenuItem) mMenuItems.get(i);
+			IMenuItem menuItem =  mMenuItems.get(i);
 			menuItem.clearEntityModifiers();
 			movingItem(i, duration, menuItem, initialX, initialY, i == mMenuItems.size() - 1);
 			initialY += menuItem.getHeight() + mDistanceItem;
@@ -239,14 +239,14 @@ public abstract class ExpandableMenu extends BaseMenu {
 	@Override
 	public void invalidate() {
 		for (int i = 0; i < mMenuItems.size(); i++) {
-			MenuItem menuItem = (MenuItem) mMenuItems.get(i);
+			IMenuItem menuItem = mMenuItems.get(i);
 			float x = mControl.getX();
 			float y = mControl.getY();
 			menuItem.setPosition(x, y);
 			mItemLayer.attachChild(menuItem);
 			unregisterTouchArea(menuItem);
 			registerTouchArea(menuItem);
-			menuItem.setEnabled(false);
+			menuItem.setEnable(false);
 		}
 	}
 

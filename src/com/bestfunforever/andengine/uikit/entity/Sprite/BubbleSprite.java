@@ -13,7 +13,7 @@ import org.andengine.util.HorizontalAlign;
 
 import android.util.Log;
 
-import com.bestfunforever.andengine.uikit.entity.Sprite.BaseSprite;
+import com.bestfunforever.andengine.uikit.entity.State;
 
 public class BubbleSprite extends BaseSprite {
 	public BubbleSprite(float pX, float pY, String text, Font font, ITextureRegion pTextureRegion,

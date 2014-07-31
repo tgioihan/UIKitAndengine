@@ -6,5 +6,4 @@ import org.andengine.entity.shape.IAreaShape;
 import com.bestfunforever.andengine.uikit.entity.ISelector;
 
 public interface IMenuItem extends ISelector,ITouchArea,IAreaShape{
-	public int getID();
 }

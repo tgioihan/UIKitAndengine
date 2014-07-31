@@ -1,17 +1,15 @@
 package com.bestfunforever.andengine.uikit.entity.Sprite;
 
 import org.andengine.entity.sprite.AnimatedSprite;
-import org.andengine.entity.sprite.Sprite;
 import org.andengine.input.touch.TouchEvent;
-import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
+import android.util.Log;
+
 import com.bestfunforever.andengine.uikit.entity.IClick;
 import com.bestfunforever.andengine.uikit.entity.ISelector;
-import com.bestfunforever.andengine.uikit.entity.Sprite.BaseSprite.State;
-
-import android.util.Log;
+import com.bestfunforever.andengine.uikit.entity.State;
 
 public abstract class BaseAnimateSprite extends AnimatedSprite implements ISelector {
 
@@ -32,10 +30,6 @@ public abstract class BaseAnimateSprite extends AnimatedSprite implements ISelec
 	public void setId(int id) {
 		// TODO Auto-generated method stub
 		this.ID = id;
-	}
-
-	public enum State {
-		NORMAL, PRESS, SELECTED, NOACTION
 	}
 
 	protected State mState = State.NOACTION;
@@ -78,7 +72,7 @@ public abstract class BaseAnimateSprite extends AnimatedSprite implements ISelec
 		return isEnabled;
 	}
 
-	public void setEnabled(boolean isEnabled) {
+	public void setEnable(boolean isEnabled) {
 		this.isEnabled = isEnabled;
 	}
 

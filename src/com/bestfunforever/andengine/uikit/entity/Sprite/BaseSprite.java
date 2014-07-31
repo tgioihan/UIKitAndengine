@@ -5,10 +5,11 @@ import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
+import android.util.Log;
+
 import com.bestfunforever.andengine.uikit.entity.IClick;
 import com.bestfunforever.andengine.uikit.entity.ISelector;
-
-import android.util.Log;
+import com.bestfunforever.andengine.uikit.entity.State;
 
 public abstract class BaseSprite extends Sprite implements ISelector {
 
@@ -29,10 +30,6 @@ public abstract class BaseSprite extends Sprite implements ISelector {
 	public void setId(int id) {
 		// TODO Auto-generated method stub
 		this.ID = id;
-	}
-
-	public enum State {
-		NORMAL, PRESS, SELECTED, NOACTION
 	}
 
 	protected State mState = State.NOACTION;
@@ -77,7 +74,7 @@ public abstract class BaseSprite extends Sprite implements ISelector {
 		return isEnabled;
 	}
 
-	public void setEnabled(boolean isEnabled) {
+	public void setEnable(boolean isEnabled) {
 		this.isEnabled = isEnabled;
 	}
 
